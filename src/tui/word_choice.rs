@@ -3,10 +3,9 @@ use ratatui::{
   crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers},
   layout::{Constraint, Layout},
   style::{Color, Style},
-  text::Text,
   widgets::{
-    List, ListState, Paragraph, Scrollbar, ScrollbarOrientation,
-    ScrollbarState, StatefulWidget, Widget,
+    List, ListState, Scrollbar, ScrollbarOrientation, ScrollbarState,
+    StatefulWidget, Widget,
   },
 };
 use std::marker::PhantomData;

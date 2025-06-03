@@ -4,12 +4,12 @@ use std::{
   io::{BufRead, BufReader},
 };
 
-use either::Either::{self, *};
+use either::Either::*;
 
 use color_eyre::eyre::{self, OptionExt};
 use itertools::Itertools;
 use ratatui::{
-  style::{Color, Modifier, Stylize},
+  style::{Modifier, Stylize},
   text::{Line, Span, Text},
 };
 use regex::Regex;
@@ -400,84 +400,6 @@ pub fn dump<'a>(db: &Database) -> Text<'a> {
   for (key, value) in db.data.iter() {
     writeln!(buf, "{key:?} : {:?}", value.word).unwrap();
   }
-  buf.into()
-}
-
-pub fn phones<'a>(
-  db: &mut WorkingDatabase,
-  popularity_low: Option<usize>,
-  popularity_high: Option<usize>,
-) -> Text<'a> {
-  let mut buf = String::new();
-
-  let phone_map: &HashMap<String, HashSet<Uuid>> = match db.phones {
-    Some(ref phone_map) => phone_map,
-    None => {
-      db.generate_phones();
-      db.phones.as_ref().unwrap()
-    }
-  };
-
-  for (phone, related) in phone_map
-    .into_iter()
-    .filter(|(_, related)| {
-      !(popularity_low
-        .map(|v| related.len() < v)
-        .unwrap_or_default()
-        || popularity_high
-          .map(|v| related.len() > v)
-          .unwrap_or_default())
-    })
-    .sorted_by_key(|(phone, _)| phone.as_str())
-  {
-    writeln!(buf, "## {phone} ##").unwrap();
-    for word in related
-      .iter()
-      .map(|uuid| &db.data.get(uuid).unwrap().word.variants[0])
-      .sorted()
-    {
-      write!(buf, "{word}  ").unwrap();
-    }
-    write!(buf, "\n\n").unwrap();
-  }
-
-  buf.into()
-}
-
-pub fn phone<'a>(db: &mut WorkingDatabase, phone: String) -> Text<'a> {
-  let phone = if db.ignore_terminal_Y {
-    phone.strip_suffix("Y").unwrap_or(&phone)
-  } else {
-    &phone
-  };
-
-  let phone_map: &HashMap<String, HashSet<Uuid>> = match db.phones {
-    Some(ref phone_map) => phone_map,
-    None => {
-      db.generate_phones();
-      db.phones.as_ref().unwrap()
-    }
-  };
-
-  let mut buf = String::new();
-
-  let Some(related) = phone_map.get(phone) else {
-    return Text::styled(
-      format!("phone {phone} not found in any words\n"),
-      Color::Red,
-    );
-  };
-
-  write!(buf, "## {phone} ##\n\n").unwrap();
-
-  for word in related
-    .iter()
-    .map(|uuid| &db.data.get(uuid).unwrap().word.variants[0])
-    .sorted()
-  {
-    write!(buf, "{word}\n").unwrap();
-  }
-
   buf.into()
 }
 
