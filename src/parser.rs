@@ -1,4 +1,8 @@
-use std::iter::Peekable;
+use std::{iter::Peekable, str::FromStr};
+
+use bitflags::bitflags;
+
+use crate::lang::POSType;
 
 #[derive(Clone, Copy, Debug)]
 pub enum SheetType {
@@ -8,26 +12,47 @@ pub enum SheetType {
   Particles,
 }
 
+bitflags! {
+  pub struct POSTypeFlags: u8 {
+    const NOUN = 0b0001;
+    const DESCRIPTOR = 0b0010;
+    const VERB = 0b0100;
+    const PARTICLE = 0b1000;
+    const _ = 0b1111;
+  }
+}
+
+impl Into<POSTypeFlags> for POSType {
+  fn into(self) -> POSTypeFlags {
+    match self {
+      POSType::Noun => POSTypeFlags::NOUN,
+      POSType::Descriptor => POSTypeFlags::DESCRIPTOR,
+      POSType::Verb => POSTypeFlags::VERB,
+      POSType::Particle => POSTypeFlags::PARTICLE,
+    }
+  }
+}
+
 pub enum Commands {
   Update {
     sheet_ty: SheetType,
     sheet_file: std::path::PathBuf,
   },
   Dump,
-  Phones {
-    popular_low: Option<usize>,
-    popular_high: Option<usize>,
-  },
   Phone {
-    phone: String,
+    phone_matching: Option<(String, MatchType)>,
+    bounds: Option<PopularityBounds>,
   },
   Word {
     word: String,
-    fuzzy: bool,
+    match_type: MatchType,
+    pos_guards: POSTypeFlags,
+    edit: bool,
   },
   Search {
     content: String,
   },
+  Choose,
   New,
   #[allow(non_snake_case)]
   Flags {
@@ -35,6 +60,22 @@ pub enum Commands {
     ignore_H: Option<bool>,
   },
   Quit,
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub enum MatchType {
+  #[default]
+  Standard,
+  Fuzzy,
+  Regex,
+}
+
+pub enum PopularityBounds {
+  Unique,
+  LowHigh {
+    low: Option<usize>,
+    high: Option<usize>,
+  },
 }
 
 struct ParsingIter<I: Iterator> {
@@ -64,10 +105,6 @@ impl<I: Iterator<Item = char>> Iterator for ParsingIter<I> {
 impl<I: Iterator> ParsingIter<I> {
   fn is_empty(&mut self) -> bool {
     self.chrs.peek().is_none()
-  }
-
-  fn into_consumed(self) -> String {
-    self.consumed
   }
 
   fn get_pos(&self) -> usize {
@@ -170,76 +207,139 @@ pub fn parse(inp: &str) -> Result<Commands, ParseError> {
       }
     }
     "phones" => {
-      if parser.is_empty() {
-        Ok(Commands::Phones {
-          popular_low: None,
-          popular_high: None,
-        })
-      } else {
+      let mut phone_matching: Option<(Option<String>, MatchType)> = None;
+      let mut bounds = None;
+
+      loop {
         parser.skip_space();
-        if !parser.is_flag() {
-          let (_, phone) = parser.read_until_space();
-          if !parser.is_empty() {
-            parse_err!(parser.get_pos(), inp)
-          } else {
-            Ok(Commands::Phone { phone })
-          }
-        } else {
-          let mut popular_low = None;
-          let mut popular_high = None;
-          loop {
-            let (pos, Some(flag)) = parser.read_flag() else {
-              break;
-            };
-            match flag.as_str() {
-              "u" | "unique" => {
-                if popular_low.is_some() || popular_high.is_some() {
-                  return parse_err!(
-                    pos,
-                    inp,
-                    "unique flag must be used alone"
-                  );
-                } else {
-                  popular_low = Some(1);
-                  popular_high = Some(1);
-                }
+
+        if parser.is_empty() {
+          break;
+        }
+
+        if let (pos, Some(flag)) = parser.read_flag() {
+          match flag.as_str() {
+            "f" | "fuzzy" => match phone_matching {
+              Some((pattern, MatchType::Standard)) => {
+                phone_matching = Some((pattern, MatchType::Fuzzy))
               }
-              "p" | "popularity" => {
-                if popular_low.is_some() {
-                  return parse_err!(
-                    pos,
-                    inp,
-                    "popularity bounds already declared"
-                  );
-                } else {
-                  parser.skip_space();
-                  let (pos, num) = parser.read_until_space();
-                  if let Ok(v) = num.parse::<usize>() {
-                    popular_low = Some(v);
-                  } else {
-                    return parse_err!(pos, inp, "expected positive number");
-                  }
-                }
+              None => phone_matching = Some((None, MatchType::Fuzzy)),
+              _ => return parse_err!(pos, inp, "match type already set"),
+            },
+            "r" | "regex" => match phone_matching {
+              Some((pattern, MatchType::Standard)) => {
+                phone_matching = Some((pattern, MatchType::Regex))
               }
-              f => {
+              None => phone_matching = Some((None, MatchType::Regex)),
+              _ => return parse_err!(pos, inp, "match type already set"),
+            },
+            "u" | "unique" => match bounds {
+              Some(PopularityBounds::Unique) => {
+                return parse_err!(pos, inp, format!("duplicate flag u"))
+              }
+              Some(PopularityBounds::LowHigh { .. }) => {
                 return parse_err!(
-                  parser.get_pos(),
+                  pos,
                   inp,
-                  format!("unknown flag {f}")
-                );
+                  "unique bounds are incompatible with popularity bounds"
+                )
+              }
+              None => bounds = Some(PopularityBounds::Unique),
+            },
+            "l" | "low" => {
+              parser.skip_space();
+              let (pos, value) = parser.read_until_space();
+              let Ok(value) = value.parse::<usize>() else {
+                return parse_err!(pos, inp, "expected number");
+              };
+              match bounds {
+                Some(PopularityBounds::Unique) => {
+                  return parse_err!(
+                    pos,
+                    inp,
+                    "popularity bounds are incompatible with unique bounds"
+                  )
+                }
+                Some(PopularityBounds::LowHigh { low: Some(_), .. }) => {
+                  return parse_err!(
+                    pos,
+                    inp,
+                    "low popularity bound already defined"
+                  )
+                }
+                Some(PopularityBounds::LowHigh { ref mut low, .. }) => {
+                  *low = Some(value);
+                }
+                None => {
+                  bounds = Some(PopularityBounds::LowHigh {
+                    low: Some(value),
+                    high: None,
+                  })
+                }
               }
             }
-            parser.skip_space();
+            "h" | "high" => {
+              parser.skip_space();
+              let (pos, value) = parser.read_until_space();
+              let Ok(value) = value.parse::<usize>() else {
+                return parse_err!(pos, inp, "expected number");
+              };
+              match bounds {
+                Some(PopularityBounds::Unique) => {
+                  return parse_err!(
+                    pos,
+                    inp,
+                    "popularity bounds are incompatible with unique bounds"
+                  )
+                }
+                Some(PopularityBounds::LowHigh { high: Some(_), .. }) => {
+                  return parse_err!(
+                    pos,
+                    inp,
+                    "high popularity bound already defined"
+                  )
+                }
+                Some(PopularityBounds::LowHigh { ref mut high, .. }) => {
+                  *high = Some(value);
+                }
+                None => {
+                  bounds = Some(PopularityBounds::LowHigh {
+                    low: Some(value),
+                    high: None,
+                  })
+                }
+              }
+            }
+            f => return parse_err!(pos, inp, format!("unknown flag {f}")),
           }
-          if !parser.is_empty() {
-            parse_err!(parser.get_pos(), inp)
-          } else {
-            Ok(Commands::Phones {
-              popular_low,
-              popular_high,
-            })
+        } else {
+          let (pos, value) = parser.read_until_space();
+          phone_matching = match phone_matching {
+            Some((Some(_), ..)) => {
+              return parse_err!(pos, inp, format!("expected flag"))
+            }
+            Some((None, match_type)) => Some((Some(value), match_type)),
+            None => Some((Some(value), MatchType::Standard)),
           }
         }
+      }
+
+      Ok(Commands::Phone {
+        phone_matching: match phone_matching {
+          Some((Some(phone), match_type)) => Some((phone, match_type)),
+          Some((None, ..)) => {
+            return parse_err!(parser.get_pos(), inp, "expected phone pattern")
+          }
+          None => None,
+        },
+        bounds,
+      })
+    }
+    "choice" => {
+      if !parser.is_empty() {
+        parse_err!(parser.get_pos(), inp)
+      } else {
+        Ok(Commands::Choose)
       }
     }
     "search" => {
@@ -297,7 +397,9 @@ pub fn parse(inp: &str) -> Result<Commands, ParseError> {
     }
     "word" => {
       let mut word = None;
-      let mut fuzzy = false;
+      let mut match_type = MatchType::Standard;
+      let mut postyflags = None;
+      let mut edit = false;
       loop {
         parser.skip_space();
         if parser.is_empty() {
@@ -309,11 +411,47 @@ pub fn parse(inp: &str) -> Result<Commands, ParseError> {
             return parse_err!(pos, inp, "expected flag");
           };
           match flag.as_str() {
+            "p" | "pos" => {
+              if postyflags.is_some() {
+                return parse_err!(pos, inp, "pos guards already set");
+              }
+
+              parser.skip_space();
+              let (pos, poses) = parser.read_until_space();
+              let mut newflags = POSTypeFlags::empty();
+              for (pos, chunk) in poses.split(',').scan(pos, |pos, chunk| {
+                let stashed = *pos;
+                *pos += chunk.len() + 1;
+                Some((stashed, chunk))
+              }) {
+                match POSType::from_str(chunk) {
+                  Ok(ty) => newflags |= ty.into(),
+                  Err(_) => {
+                    return parse_err!(pos, inp, "expected valid POS specifier")
+                  }
+                }
+              }
+              postyflags = Some(newflags)
+            }
             "f" | "fuzzy" => {
-              if fuzzy {
-                return parse_err!(pos, inp, "duplicate fuzzy flag");
+              if match_type != MatchType::Standard {
+                return parse_err!(pos, inp, "match type already set");
               } else {
-                fuzzy = true;
+                match_type = MatchType::Fuzzy;
+              }
+            }
+            "r" | "regex" => {
+              if match_type != MatchType::Standard {
+                return parse_err!(pos, inp, "match type already set");
+              } else {
+                match_type = MatchType::Regex;
+              }
+            }
+            "e" | "edit" => {
+              if edit {
+                return parse_err!(pos, inp, "duplicate edit flag");
+              } else {
+                edit = true;
               }
             }
             f => {
@@ -337,7 +475,12 @@ pub fn parse(inp: &str) -> Result<Commands, ParseError> {
       let Some(word) = word else {
         return parse_err!(parser.get_pos(), inp, "expected word argument");
       };
-      Ok(Commands::Word { word, fuzzy })
+      Ok(Commands::Word {
+        word,
+        match_type,
+        pos_guards: postyflags.unwrap_or(POSTypeFlags::all()),
+        edit,
+      })
     }
     "new" => {
       if !parser.is_empty() {

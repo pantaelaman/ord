@@ -1,136 +1,104 @@
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
-  layout::Rect,
+  crossterm::event::{KeyCode, KeyEvent},
   style::{Color, Modifier, Style},
-  widgets::{Block, StatefulWidget, Widget},
+  widgets::Widget,
 };
+use tui_textarea::TextArea;
 
 use super::traits::{EventfulState, StylableWidget};
 
-pub struct LineInput {
-  style: Style,
-  show_cursor: bool,
-  strict_width: Option<u16>,
+pub struct LineInput<'a> {
+  pub text_area: TextArea<'a>,
 }
 
-impl Default for LineInput {
+impl<'a> Into<TextArea<'a>> for LineInput<'a> {
+  fn into(self) -> TextArea<'a> {
+    self.text_area
+  }
+}
+
+impl<'a> LineInput<'a> {
+  pub fn default_area() -> Self {
+    let mut text_area = TextArea::default();
+    text_area.set_cursor_line_style(Style::default());
+    Self { text_area }
+  }
+
+  pub fn default_or_with(text: Option<String>) -> Self {
+    match text {
+      Some(text) => Self::default_with(text),
+      None => Self::default(),
+    }
+  }
+
+  pub fn default_with(text: String) -> Self {
+    let mut text_area = TextArea::new(vec![text]);
+    text_area.set_style(Modifier::UNDERLINED.into());
+    text_area.set_cursor_line_style(Style::default());
+    text_area.set_placeholder_style(
+      Style::new()
+        .fg(Color::DarkGray)
+        .add_modifier(Modifier::UNDERLINED),
+    );
+    Self { text_area }
+  }
+}
+
+impl<'a> Default for LineInput<'a> {
   fn default() -> Self {
-    LineInput {
-      style: Modifier::UNDERLINED.into(),
-      show_cursor: true,
-      strict_width: None,
+    let mut text_area = TextArea::default();
+    text_area.set_style(Modifier::UNDERLINED.into());
+    text_area.set_cursor_line_style(Style::default());
+    text_area.set_placeholder_style(
+      Style::new()
+        .fg(Color::DarkGray)
+        .add_modifier(Modifier::UNDERLINED),
+    );
+    LineInput { text_area }
+  }
+}
+
+impl<'a> std::ops::Deref for LineInput<'a> {
+  type Target = TextArea<'a>;
+
+  fn deref(&self) -> &Self::Target {
+    &self.text_area
+  }
+}
+
+impl<'a> std::ops::DerefMut for LineInput<'a> {
+  fn deref_mut(&mut self) -> &mut Self::Target {
+    &mut self.text_area
+  }
+}
+
+impl<'a> EventfulState<KeyEvent> for LineInput<'a> {
+  fn handle_ev(&mut self, event: KeyEvent) -> Option<KeyEvent> {
+    match event {
+      key_event!(KeyCode::Enter) => Some(event),
+      ev => self.text_area.handle_ev(ev),
     }
   }
 }
 
-impl LineInput {
-  pub fn strict_width(self, width: u16) -> Self {
-    LineInput {
-      strict_width: Some(width),
-      ..self
-    }
+impl<'a> StylableWidget for LineInput<'a> {
+  fn style(&mut self, style: Style) {
+    StylableWidget::style(&mut self.text_area, style);
+  }
+
+  fn focus_style(&mut self, style: Option<Style>, focused: bool) {
+    StylableWidget::focus_style(&mut self.text_area, style, focused);
   }
 }
 
-impl StylableWidget for LineInput {
-  fn style(self, style: Style) -> Self {
-    LineInput { style, ..self }
-  }
-
-  fn focus_style(self, style: Option<Style>, focused: bool) -> Self {
-    LineInput {
-      style: self.style.patch(style.unwrap_or_default()),
-      show_cursor: focused,
-      ..self
-    }
-  }
-}
-
-#[derive(Debug, Default)]
-pub struct LineInputState {
-  content: Vec<char>,
-  cursor: usize,
-}
-
-impl LineInputState {
-  pub fn clear(&mut self) {
-    self.content.clear();
-    self.cursor = 0;
-  }
-
-  pub fn get_str(&self) -> &str {
-    self.content.as_slice()
-  }
-}
-impl EventfulState<KeyEvent> for LineInputState {
-  fn handle_ev(&mut self, ev: KeyEvent) -> Option<KeyEvent> {
-    match ev {
-      key_event!(KeyCode::Char(c), KeyModifiers::NONE, KeyModifiers::SHIFT) => {
-        self.content.insert(self.cursor, c);
-        self.cursor += 1;
-      }
-      key_event!(KeyCode::Backspace) => {
-        if self.cursor > 0 {
-          self.content.remove(self.cursor - 1);
-          self.cursor -= 1;
-        }
-      }
-      key_event!(KeyCode::Left) => {
-        self.cursor = self.cursor.saturating_sub(1);
-      }
-      key_event!(KeyCode::Right) => {
-        self.cursor = self.cursor.saturating_add(1);
-      }
-      key_event!(KeyCode::Home) => {
-        self.cursor = 0;
-      }
-      key_event!(KeyCode::End) => {
-        self.cursor = self.content.len();
-      }
-      ev => return Some(ev),
-    }
-
-    None
-  }
-}
-
-impl StatefulWidget for LineInput {
-  type State = LineInputState;
-
+impl<'a> Widget for &LineInput<'a> {
   fn render(
     self,
     area: ratatui::prelude::Rect,
     buf: &mut ratatui::prelude::Buffer,
-    state: &mut Self::State,
-  ) {
-    let max_width = self
-      .strict_width
-      .map(|v| v as usize)
-      .unwrap_or_else(|| state.content.len());
-
-    let offset_x = std::cmp::min(
-      state.content.len().saturating_sub(max_width),
-      state.cursor,
-    );
-    let slice = &state.content[offset_x..];
-    let actual_cursor = state.cursor - offset_x;
-
-    buf.set_stringn(
-      area.x,
-      area.y,
-      format!("{:<width$}", slice, width = max_width),
-      std::cmp::min(max_width, area.width as usize),
-      self.style,
-    );
-    if self.show_cursor {
-      buf.set_style(
-        Rect::new(area.x + actual_cursor as u16, area.y, 1, 1),
-        Style {
-          fg: self.style.bg.or(Some(Color::Black)),
-          bg: self.style.fg.or(Some(Color::White)),
-          ..self.style
-        },
-      );
-    }
+  ) where
+    Self: Sized,
+  {
+    self.text_area.render(area, buf);
   }
 }

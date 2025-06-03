@@ -1,95 +1,135 @@
-use std::marker::PhantomData;
-
 use color_eyre::eyre;
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use itertools::Itertools;
+use ratatui::crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::{
   buffer::Buffer,
   layout::{Constraint, Layout, Rect},
-  style::{Color, Modifier, Style},
-  text::Line,
-  widgets::StatefulWidget,
+  style::{Color, Style},
+  widgets::{StatefulWidget, Widget},
 };
+use tui_textarea::TextArea;
 
-use crate::lang::POS;
+use crate::lang::{self, POSType, ParticleCategory, Word};
 
+use super::line_input::LineInput;
 use super::{
   dropdown::{Dropdown, DropdownState},
-  focus::{FocusManager, Focusable, FocusableState, Focuser, NamedFocusChain},
+  focus::{FocusManager, Focusable},
   left_label::LeftLabelled,
-  line_input::{LineInput, LineInputState},
-  traits::{EventfulState, OptionEventExt},
 };
+
+const LEFT_OFFSET: u16 = 15;
 
 macro_rules! wedit_fmanager {
   () => {
     FocusManager::default()
-      .focus_style(Modifier::UNDERLINED)
-      .unfocus_style(
-        Style::default()
-          .fg(Color::Blue)
-          .add_modifier(Modifier::BOLD),
-      )
+      .focus_style(Style::default())
+      .unfocus_style(Style::new().fg(Color::Blue))
   };
 }
 
 macro_rules! wedit_dropdown {
-  ($state:expr) => {
-    Dropdown::new($state)
+  () => {
+    Dropdown::default()
       .selected_style(Style::reset().fg(Color::Black).bg(Color::Yellow))
-      .open_style(Style::reset().fg(Color::Black).bg(Color::Blue));
+      .open_style(Style::reset().fg(Color::Black).bg(Color::Blue))
   };
 }
 
 macro_rules! wedit_lineinput {
-  ($state:expr, $label:expr) => {
-    Focusable::new(
-      $state,
-      LeftLabelled::new($label, LineInput::default().strict_width(20)),
-    )
+  ($focus:expr, $fmanager:expr, $label:expr) => {
+    LeftLabelled::new($label, $focus.internal_widget(&$fmanager))
+      .width(LEFT_OFFSET)
   };
 }
 
+macro_rules! wedit_evhandlers {
+  ($($handler:expr),+) => {
+    [$($handler as &mut dyn crate::tui::focus::TaggedEventful<_, _>),+]
+  }
+}
+
+#[derive(PartialEq, Eq, Clone, Copy, Hash)]
+enum ComponentTag {
+  Variants,
+  POS,
+  Phones,
+  Definition,
+  Category,
+  Inp1,
+  Inp2,
+  Inp3,
+}
+
 pub fn run_word_edit<T: ratatui::prelude::Backend>(
-  db: &mut crate::db::WorkingDatabase,
+  word: Option<&Word>,
   terminal: &mut ratatui::Terminal<T>,
-) -> eyre::Result<()> {
-  let mut top_focus_manager = wedit_fmanager!();
-  let mut variants_input: FocusableState<LineInputState> =
-    top_focus_manager.new_child(LineInputState::default());
-  let mut pos_input: FocusableState<DropdownState<&'static str>> =
-    top_focus_manager.new_child(DropdownState::new([
-      "noun",
-      "particle",
-      "descriptor",
-      "verb",
-    ]));
-  let mut bot_focus_manager = wedit_fmanager!();
-  let mut phones_input: FocusableState<LineInputState> =
-    bot_focus_manager.new_child(LineInputState::default());
-  let mut definition_input: FocusableState<LineInputState> =
-    bot_focus_manager.new_child(LineInputState::default());
+) -> eyre::Result<Option<Word>> {
+  let mut fmanager = wedit_fmanager!();
+  let mut variants_input: Focusable<ComponentTag, LineInput> = fmanager
+    .new_child(ComponentTag::Variants)
+    .with_state(LineInput::default_or_with(
+      word.map(|w| w.variants.clone().into_iter().join(",")),
+    ));
+  let mut pos_input: Focusable<ComponentTag, DropdownState<POSType>> =
+    fmanager.new_child(ComponentTag::POS).with_state(
+      DropdownState::new([
+        POSType::Noun,
+        POSType::Descriptor,
+        POSType::Verb,
+        POSType::Particle,
+      ])
+      .with_initial(|o| word.is_none_or(|word| word.pos.ty() == *o)),
+    );
 
-  let mut focus_chain = NamedFocusChain::new([
-    ("top", top_focus_manager),
-    ("bot", bot_focus_manager),
-  ]);
+  fmanager.new_hidden_child(ComponentTag::Category);
 
-  focus_chain.register_focuser("pos", wedit_fmanager!());
+  let mut phones_input: Focusable<ComponentTag, LineInput> = fmanager
+    .new_child(ComponentTag::Phones)
+    .with_state(LineInput::default_or_with(
+      word.map(|w| w.phones.clone().into_iter().join(",")),
+    ));
+  let mut definition_input: Focusable<ComponentTag, TextArea> = fmanager
+    .new_child(ComponentTag::Definition)
+    .with_state(match word {
+      Some(ref w) => {
+        TextArea::new(w.definition.lines().map(|s| s.to_owned()).collect_vec())
+      }
+      None => TextArea::default(),
+    });
 
-  focus_chain.grant_focus();
-  let (mut pos_component, _) = POS_Component::from_dropdown(pos_input.get());
+  definition_input.set_cursor_line_style(Style::default());
+
+  fmanager.new_hidden_child(ComponentTag::Inp1);
+  fmanager.new_hidden_child(ComponentTag::Inp2);
+  fmanager.new_hidden_child(ComponentTag::Inp3);
+
+  let mut pos_component = match word {
+    Some(w) => POS_Component::from_word(w, &mut fmanager),
+    None => POS_Component::from_dropdown(*pos_input.get(), &mut fmanager),
+  };
+
+  fmanager.set_focus(0);
+
+  if word.is_some_and(|word| !word.is_standard()) {
+    // reset changed so we don't overwrite the irregular forms
+    pos_input.changed();
+  }
 
   loop {
     if pos_input.changed() {
-      focus_chain.remove_focuser(&"pos");
-      let (posc, fmanager) = POS_Component::from_dropdown(pos_input.get());
-      pos_component = posc;
-      *focus_chain.get_focuser_mut(&"pos").unwrap() = fmanager;
-      if let POS_Component::Particle { .. } = pos_component {
-        focus_chain.insert_focuser_after("pos", &"top");
-      } else {
-        focus_chain.insert_focuser_after("pos", &"bot");
-      }
+      fmanager.disable_if(|t| {
+        [
+          ComponentTag::Inp1,
+          ComponentTag::Inp2,
+          ComponentTag::Inp3,
+          ComponentTag::Category,
+        ]
+        .contains(t)
+      });
+      pos_component =
+        POS_Component::from_dropdown(*pos_input.get(), &mut fmanager);
+      pos_component.update_placeholders(variants_input.lines()[0].as_str());
     }
 
     terminal.draw(|f| {
@@ -113,134 +153,364 @@ pub fn run_word_edit<T: ratatui::prelude::Backend>(
           Constraint::Fill(1),
         ]).areas(f.area());
 
-        let variants_widget = wedit_lineinput!(&mut variants_input, "Variants: ");
-        let pos_widget = wedit_dropdown!(&mut pos_input);
-        let phones_widget = wedit_lineinput!(&mut phones_input, "Phones: ");
-        let definition_widget = wedit_lineinput!(&mut definition_input, "Definition: ");
+        f.render_widget(wedit_lineinput!(variants_input, fmanager, "Word: "), variants_line);
+        f.render_widget(wedit_lineinput!(phones_input, fmanager, "Phones: "), phones_line);
+        f.render_widget(wedit_lineinput!(definition_input, fmanager, "Definition: "), definition_lines);
 
         let [
           pos_seg,
           _,
           cat_seg
           ] = Layout::horizontal([
-            Constraint::Length(pos_widget.line_width()),
+            Constraint::Length(pos_input.line_width() + 14),
             Constraint::Length(2),
             Constraint::Fill(1)
           ]).areas(pos_line);
 
-        let mut top_focuser = focus_chain.get_focuser(&"top").unwrap();
-        let mut bot_focuser = focus_chain.get_focuser(&"bot").unwrap();
+        f.render_stateful_widget(
+          pos_input.widget(
+            LeftLabelled::new("POS: ", wedit_dropdown!()).width(LEFT_OFFSET),
+            &fmanager
+          ),
+          pos_seg,
+          &mut pos_input
+        );
 
-        f.render_stateful_widget(variants_widget, variants_line, &mut top_focuser);
-        f.render_stateful_widget(phones_widget, phones_line, &mut bot_focuser);
-        f.render_stateful_widget(definition_widget, definition_lines, &mut bot_focuser);
-        f.render_stateful_widget(pos_widget, pos_seg, &mut top_focuser);
-
-        pos_component.render(f.buffer_mut(), pos_specific_chunk, cat_seg, focus_chain.get_focuser(&"pos").unwrap());
-
-        //f.render_widget(
-        //  Paragraph::new(
-        //    format!(
-        //      "{:?} {}:{}:{}",
-        //      main_focus_manager.focus,
-        //      variants_input.focus_id,
-        //      phones_input.focus_id,
-        //      definition_input.focus_id)),
-        //    pos_line);
+        pos_component.render(f.buffer_mut(), pos_specific_chunk, cat_seg, &fmanager);
       })?;
 
-    if let crossterm::event::Event::Key(k) = crossterm::event::read()? {
+    if let ratatui::crossterm::event::Event::Key(k) =
+      ratatui::crossterm::event::read()?
+    {
       match k {
         key_event!(KeyCode::Char('c'), KeyModifiers::CONTROL) => {
+          return Ok(None);
+        }
+        key_event!(KeyCode::Char('s'), KeyModifiers::CONTROL) => {
           break;
         }
         key_event!(KeyCode::Tab, KeyModifiers::NONE) => {
-          focus_chain.focus_next();
+          fmanager.next();
+        }
+        key_event!(KeyCode::BackTab, KeyModifiers::SHIFT) => {
+          fmanager.prev();
         }
         ev => {
-          let top_focuser = focus_chain.get_focuser(&"top").unwrap();
-          let bot_focuser = focus_chain.get_focuser(&"bot").unwrap();
-          let pos_focuser = focus_chain.get_focuser(&"pos").unwrap();
+          if variants_input.has_focus(&fmanager) {
+            if variants_input.input(ev) {
+              pos_component
+                .update_placeholders(variants_input.lines()[0].as_str());
+            }
+          }
 
-          (&mut variants_input, top_focuser)
-            .handle_ev(ev)
-            .chain_with(&mut (&mut pos_input, top_focuser))
-            .chain_with(&mut (&mut phones_input, bot_focuser))
-            .chain_with(&mut (&mut definition_input, bot_focuser))
-            .chain_with(&mut (&mut pos_component, pos_focuser));
+          if let Some(ev) = fmanager.handle_ev(
+            ev,
+            wedit_evhandlers!(
+              &mut pos_input,
+              &mut phones_input,
+              &mut definition_input
+            ),
+          ) {
+            pos_component.handle_ev(&fmanager, ev);
+          }
         }
       }
     }
   }
 
-  Ok(())
+  let variants = Into::<TextArea>::into(variants_input.into_inner())
+    .into_lines()
+    .into_iter()
+    .nth(0)
+    .unwrap()
+    .split(",")
+    .map(|s| s.to_owned())
+    .collect_vec();
+  let phones = Into::<TextArea>::into(phones_input.into_inner())
+    .into_lines()
+    .into_iter()
+    .nth(0)
+    .unwrap()
+    .split(",")
+    .map(|s| s.to_owned())
+    .collect_vec();
+  let definition = definition_input
+    .into_inner()
+    .into_lines()
+    .into_iter()
+    .filter(|s| !s.is_empty())
+    .join("; ");
+  let (irregular, pos) = pos_component.into_pos(&variants[0]);
+
+  Ok(Some(Word {
+    variants,
+    phones,
+    definition,
+    standard: !irregular,
+    pos,
+  }))
 }
 
 #[allow(non_camel_case_types)]
-enum POS_Component {
+enum POS_Component<'a> {
   Noun {
-    plural: FocusableState<LineInputState>,
-    definite: FocusableState<LineInputState>,
-    definite_plural: FocusableState<LineInputState>,
+    plural: Focusable<ComponentTag, LineInput<'a>>,
+    definite: Focusable<ComponentTag, LineInput<'a>>,
+    definite_plural: Focusable<ComponentTag, LineInput<'a>>,
   },
   Descriptor {
-    plural: FocusableState<LineInputState>,
-    adverbial: FocusableState<LineInputState>,
+    plural: Focusable<ComponentTag, LineInput<'a>>,
+    adverbial: Focusable<ComponentTag, LineInput<'a>>,
   },
   Verb {
-    present: FocusableState<LineInputState>,
-    past: FocusableState<LineInputState>,
+    present: Focusable<ComponentTag, LineInput<'a>>,
+    past: Focusable<ComponentTag, LineInput<'a>>,
   },
   Particle {
-    dropdown: FocusableState<DropdownState<&'static str>>,
+    dropdown: Focusable<ComponentTag, DropdownState<ParticleCategory>>,
   },
 }
 
-impl POS_Component {
-  fn from_dropdown(pos: &'static str) -> (Self, FocusManager) {
-    let mut fmanager = wedit_fmanager!();
-    (
-      match pos {
-        "noun" => Self::Noun {
-          plural: fmanager.new_child(LineInputState::default()),
-          definite: fmanager.new_child(LineInputState::default()),
-          definite_plural: fmanager.new_child(LineInputState::default()),
-        },
-        "descriptor" => Self::Descriptor {
-          plural: fmanager.new_child(LineInputState::default()),
-          adverbial: fmanager.new_child(LineInputState::default()),
-        },
-        "verb" => Self::Verb {
-          present: fmanager.new_child(LineInputState::default()),
-          past: fmanager.new_child(LineInputState::default()),
-        },
-        "particle" => Self::Particle {
-          dropdown: fmanager.new_child(DropdownState::new([
-            "article",
-            "comparator",
-            "conjunction",
-            "contextual",
-            "discursive",
-            "indicator",
-            "introductor",
-            "miscellaneous",
-          ])),
-        },
-        _ => unimplemented!(),
+macro_rules! expand_generic {
+  ($irregular:ident, $input:expr, $generator:expr) => {{
+    let val = Into::<TextArea>::into($input)
+      .into_lines()
+      .into_iter()
+      .nth(0)
+      .unwrap();
+    if val.is_empty() {
+      $generator
+    } else {
+      $irregular = true;
+      val
+    }
+  }};
+}
+
+impl<'a> POS_Component<'a> {
+  fn from_dropdown(
+    pos: POSType,
+    fmanager: &mut FocusManager<ComponentTag>,
+  ) -> Self {
+    match pos {
+      POSType::Noun => Self::Noun {
+        plural: fmanager
+          .new_from_existing(ComponentTag::Inp1)
+          .with_state(LineInput::default()),
+        definite: fmanager
+          .new_from_existing(ComponentTag::Inp2)
+          .with_state(LineInput::default()),
+        definite_plural: fmanager
+          .new_from_existing(ComponentTag::Inp3)
+          .with_state(LineInput::default()),
       },
-      fmanager,
-    )
+      POSType::Descriptor => Self::Descriptor {
+        plural: fmanager
+          .new_from_existing(ComponentTag::Inp1)
+          .with_state(LineInput::default()),
+        adverbial: fmanager
+          .new_from_existing(ComponentTag::Inp2)
+          .with_state(LineInput::default()),
+      },
+      POSType::Verb => Self::Verb {
+        present: fmanager
+          .new_from_existing(ComponentTag::Inp1)
+          .with_state(LineInput::default()),
+        past: fmanager
+          .new_from_existing(ComponentTag::Inp2)
+          .with_state(LineInput::default()),
+      },
+      POSType::Particle => Self::Particle {
+        dropdown: fmanager
+          .new_from_existing(ComponentTag::Category)
+          .with_state(DropdownState::new([
+            ParticleCategory::Miscellaneous,
+            ParticleCategory::Article,
+            ParticleCategory::Comparator,
+            ParticleCategory::Conjunction,
+            ParticleCategory::Contextual,
+            ParticleCategory::Discursive,
+            ParticleCategory::Indicator,
+            ParticleCategory::Introductor,
+          ])),
+      },
+    }
   }
 
-  fn render<'a>(
-    &'a mut self,
+  fn from_word(word: &Word, fmanager: &mut FocusManager<ComponentTag>) -> Self {
+    match &word.pos {
+      lang::POS::Noun {
+        plural,
+        definite,
+        definite_plural,
+      } => Self::Noun {
+        plural: fmanager.new_from_existing(ComponentTag::Inp1).with_state(
+          LineInput::default_or_with((!word.standard).then(|| plural.clone())),
+        ),
+        definite: fmanager.new_from_existing(ComponentTag::Inp2).with_state(
+          LineInput::default_or_with(
+            (!word.standard).then(|| definite.clone()),
+          ),
+        ),
+        definite_plural: fmanager
+          .new_from_existing(ComponentTag::Inp3)
+          .with_state(LineInput::default_or_with(
+            (!word.standard).then(|| definite_plural.clone()),
+          )),
+      },
+      lang::POS::Descriptor { plural, adverbial } => Self::Descriptor {
+        plural: fmanager.new_from_existing(ComponentTag::Inp1).with_state(
+          LineInput::default_or_with((!word.standard).then(|| plural.clone())),
+        ),
+        adverbial: fmanager.new_from_existing(ComponentTag::Inp2).with_state(
+          LineInput::default_or_with(
+            (!word.standard).then(|| adverbial.clone()),
+          ),
+        ),
+      },
+      lang::POS::Verb { present, past } => Self::Verb {
+        present: fmanager.new_from_existing(ComponentTag::Inp1).with_state(
+          LineInput::default_or_with((!word.standard).then(|| present.clone())),
+        ),
+        past: fmanager.new_from_existing(ComponentTag::Inp2).with_state(
+          LineInput::default_or_with((!word.standard).then(|| past.clone())),
+        ),
+      },
+      lang::POS::Particle { category } => Self::Particle {
+        dropdown: fmanager
+          .new_from_existing(ComponentTag::Category)
+          .with_state(
+            DropdownState::new([
+              ParticleCategory::Miscellaneous,
+              ParticleCategory::Article,
+              ParticleCategory::Comparator,
+              ParticleCategory::Conjunction,
+              ParticleCategory::Contextual,
+              ParticleCategory::Discursive,
+              ParticleCategory::Indicator,
+              ParticleCategory::Introductor,
+            ])
+            .with_initial(|o| o == category),
+          ),
+      },
+    }
+  }
+
+  fn into_pos(self, key_variant: &str) -> (bool, lang::POS) {
+    let mut irregular = false;
+    let pos = match self {
+      Self::Noun {
+        plural,
+        definite,
+        definite_plural,
+      } => lang::POS::Noun {
+        plural: expand_generic!(
+          irregular,
+          plural.into_inner(),
+          lang::generate_noun_plural(key_variant)
+        ),
+        definite: expand_generic!(
+          irregular,
+          definite.into_inner(),
+          lang::generate_noun_definite(key_variant)
+        ),
+        definite_plural: expand_generic!(
+          irregular,
+          definite_plural.into_inner(),
+          lang::generate_noun_definite_plural(key_variant)
+        ),
+      },
+      Self::Descriptor { plural, adverbial } => lang::POS::Descriptor {
+        plural: expand_generic!(
+          irregular,
+          plural.into_inner(),
+          lang::generate_descriptor_plural(key_variant)
+        ),
+        adverbial: expand_generic!(
+          irregular,
+          adverbial.into_inner(),
+          lang::generate_descriptor_adverbial(key_variant)
+        ),
+      },
+      Self::Verb { present, past } => lang::POS::Verb {
+        present: expand_generic!(
+          irregular,
+          present.into_inner(),
+          lang::generate_verb_present(key_variant)
+        ),
+        past: expand_generic!(
+          irregular,
+          past.into_inner(),
+          lang::generate_verb_past(key_variant)
+        ),
+      },
+      Self::Particle { dropdown } => lang::POS::Particle {
+        category: (*dropdown.get()).to_owned(),
+      },
+    };
+    (irregular, pos)
+  }
+
+  fn update_placeholders(&mut self, key_variant: &str) {
+    match self {
+      Self::Noun {
+        plural,
+        definite,
+        definite_plural,
+      } => {
+        plural.set_placeholder_text(lang::generate_noun_plural(key_variant));
+        definite
+          .set_placeholder_text(lang::generate_noun_definite(key_variant));
+        definite_plural.set_placeholder_text(
+          lang::generate_noun_definite_plural(key_variant),
+        );
+      }
+      Self::Descriptor { plural, adverbial } => {
+        plural
+          .set_placeholder_text(lang::generate_descriptor_plural(key_variant));
+        adverbial.set_placeholder_text(lang::generate_descriptor_adverbial(
+          key_variant,
+        ));
+      }
+      Self::Verb { present, past } => {
+        present.set_placeholder_text(lang::generate_verb_present(key_variant));
+        past.set_placeholder_text(lang::generate_verb_past(key_variant));
+      }
+      _ => {}
+    }
+  }
+
+  fn handle_ev(
+    &mut self,
+    fmanager: &FocusManager<ComponentTag>,
+    ev: KeyEvent,
+  ) -> Option<KeyEvent> {
+    match self {
+      Self::Noun {
+        plural,
+        definite,
+        definite_plural,
+      } => fmanager
+        .handle_ev(ev, wedit_evhandlers!(plural, definite, definite_plural)),
+      Self::Descriptor { plural, adverbial } => {
+        fmanager.handle_ev(ev, wedit_evhandlers!(plural, adverbial))
+      }
+      Self::Verb { present, past } => {
+        fmanager.handle_ev(ev, wedit_evhandlers!(present, past))
+      }
+      Self::Particle { dropdown } => {
+        fmanager.handle_ev(ev, wedit_evhandlers!(dropdown))
+      }
+    }
+  }
+
+  fn render(
+    &mut self,
     buf: &mut Buffer,
     pos_area: Rect,
     cat_area: Rect,
-    mut fmanager: &'a FocusManager,
+    fmanager: &FocusManager<ComponentTag>,
   ) {
-    const OFFSET: usize = 14;
-
     match self {
       Self::Noun {
         plural,
@@ -256,22 +526,15 @@ impl POS_Component {
           ])
           .areas(pos_area);
 
-        let plural_widget = wedit_lineinput!(
-          plural,
-          format!("{:<width$}", "Plural: ", width = OFFSET)
-        );
-        let definite_widget = wedit_lineinput!(
-          definite,
-          format!("{:<width$}", "Definite: ", width = OFFSET)
-        );
-        let definite_plural_widget = wedit_lineinput!(
-          definite_plural,
-          format!("{:<width$}", "Def. Plural: ", width = OFFSET)
-        );
+        let plural_widget = wedit_lineinput!(plural, fmanager, "Plural: ");
+        let definite_widget =
+          wedit_lineinput!(definite, fmanager, "Definite: ");
+        let definite_plural_widget =
+          wedit_lineinput!(definite_plural, fmanager, "Def. Plural: ");
 
-        plural_widget.render(plural_line, buf, &mut fmanager);
-        definite_widget.render(definite_line, buf, &mut fmanager);
-        definite_plural_widget.render(definite_plural_line, buf, &mut fmanager);
+        plural_widget.render(plural_line, buf);
+        definite_widget.render(definite_line, buf);
+        definite_plural_widget.render(definite_plural_line, buf);
       }
       Self::Descriptor { plural, adverbial } => {
         let [plural_line, adverbial_line, _] = Layout::vertical([
@@ -281,17 +544,12 @@ impl POS_Component {
         ])
         .areas(pos_area);
 
-        let plural_widget = wedit_lineinput!(
-          plural,
-          format!("{:<width$}", "Plural: ", width = OFFSET)
-        );
-        let adverbial_widget = wedit_lineinput!(
-          adverbial,
-          format!("{:<width$}", "Adverbial: ", width = OFFSET)
-        );
+        let plural_widget = wedit_lineinput!(plural, fmanager, "Plural: ");
+        let adverbial_widget =
+          wedit_lineinput!(adverbial, fmanager, "Adverbial: ");
 
-        plural_widget.render(plural_line, buf, &mut fmanager);
-        adverbial_widget.render(adverbial_line, buf, &mut fmanager);
+        plural_widget.render(plural_line, buf);
+        adverbial_widget.render(adverbial_line, buf);
       }
       Self::Verb { present, past } => {
         let [present_line, past_line, _] = Layout::vertical([
@@ -301,48 +559,19 @@ impl POS_Component {
         ])
         .areas(pos_area);
 
-        let present_widget = wedit_lineinput!(
-          present,
-          format!("{:<width$}", "Present: ", width = OFFSET)
-        );
-        let past_widget = wedit_lineinput!(
-          past,
-          format!("{:<width$}", "Past: ", width = OFFSET)
-        );
+        let present_widget = wedit_lineinput!(present, fmanager, "Present: ");
+        let past_widget = wedit_lineinput!(past, fmanager, "Past: ");
 
-        present_widget.render(present_line, buf, &mut fmanager);
-        past_widget.render(past_line, buf, &mut fmanager);
+        present_widget.render(present_line, buf);
+        past_widget.render(past_line, buf);
       }
       Self::Particle { dropdown } => {
-        let cat_widget = wedit_dropdown!(dropdown);
+        let cat_widget = wedit_dropdown!();
 
-        let cat_area = cat_widget.limit_area_width(cat_area);
-        cat_widget.render(cat_area, buf, &mut fmanager);
-      }
-    }
-  }
-}
-
-impl EventfulState<KeyEvent> for (&mut POS_Component, &FocusManager) {
-  fn handle_ev(&mut self, event: KeyEvent) -> Option<KeyEvent> {
-    let (posc, fmanager) = self;
-    match posc {
-      POS_Component::Noun {
-        plural,
-        definite,
-        definite_plural,
-      } => (plural, *fmanager)
-        .handle_ev(event)
-        .chain_with(&mut (definite, *fmanager))
-        .chain_with(&mut (definite_plural, *fmanager)),
-      POS_Component::Descriptor { plural, adverbial } => (plural, *fmanager)
-        .handle_ev(event)
-        .chain_with(&mut (adverbial, *fmanager)),
-      POS_Component::Verb { present, past } => (present, *fmanager)
-        .handle_ev(event)
-        .chain_with(&mut (past, *fmanager)),
-      POS_Component::Particle { dropdown } => {
-        (dropdown, *fmanager).handle_ev(event)
+        let cat_area = dropdown.limit_area_width(cat_area);
+        dropdown
+          .widget(cat_widget, fmanager)
+          .render(cat_area, buf, dropdown);
       }
     }
   }

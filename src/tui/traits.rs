@@ -1,14 +1,18 @@
-use crossterm::event::KeyEvent;
-use ratatui::style::Style;
+use ratatui::{
+  buffer::Buffer,
+  layout::Rect,
+  style::{Modifier, Style, Stylize},
+  widgets::WidgetRef,
+};
+use tui_textarea::TextArea;
 
 pub trait StylableWidget: Sized {
-  fn style(self, style: Style) -> Self;
+  fn style(&mut self, style: Style);
 
-  fn focus_style(self, style: Option<Style>, focused: bool) -> Self {
+  #[allow(unused)]
+  fn focus_style(&mut self, style: Option<Style>, focused: bool) {
     if let Some(style) = style {
-      self.style(style)
-    } else {
-      self
+      self.style(style);
     }
   }
 }
@@ -17,22 +21,37 @@ pub trait EventfulState<E> {
   fn handle_ev(&mut self, event: E) -> Option<E>;
 }
 
-pub trait HandleableEvent: Sized {
-  fn handle_with<W: EventfulState<Self>>(self, state: &mut W) -> Option<Self>;
-}
-
-impl HandleableEvent for KeyEvent {
-  fn handle_with<W: EventfulState<Self>>(self, state: &mut W) -> Option<Self> {
-    state.handle_ev(self)
+impl<'a, E: Into<tui_textarea::Input>> EventfulState<E> for TextArea<'a> {
+  fn handle_ev(&mut self, event: E) -> Option<E> {
+    self.input(event);
+    None
   }
 }
 
-pub trait OptionEventExt<E: HandleableEvent>: Sized {
-  fn chain_with<W: EventfulState<E>>(self, state: &mut W) -> Option<E>;
+impl<'a> StylableWidget for TextArea<'a> {
+  fn style(&mut self, style: Style) {
+    self.set_style(style.patch(Into::<Style>::into(Modifier::UNDERLINED)));
+  }
+
+  fn focus_style(&mut self, style: Option<Style>, focused: bool) {
+    if let Some(style) = style {
+      self.set_style(style.add_modifier(Modifier::UNDERLINED));
+    }
+
+    if focused {
+      self.set_cursor_style(self.cursor_line_style().reversed());
+    } else {
+      self.set_cursor_style(self.cursor_line_style());
+    }
+  }
 }
 
-impl<E: HandleableEvent> OptionEventExt<E> for Option<E> {
-  fn chain_with<W: EventfulState<E>>(self, state: &mut W) -> Option<E> {
-    self.and_then(|e| e.handle_with(state))
+pub trait WidgetRefMut {
+  fn render_ref_mut(&mut self, area: Rect, buf: &mut Buffer);
+}
+
+impl<T: WidgetRef> WidgetRefMut for T {
+  fn render_ref_mut(&mut self, area: Rect, buf: &mut Buffer) {
+    self.render_ref(area, buf);
   }
 }

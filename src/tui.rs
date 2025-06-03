@@ -1,27 +1,36 @@
+use crate::db::{Database, WorkingDatabase};
 use crate::parser::Commands;
 use color_eyre::eyre;
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-use line_input::{LineInput, LineInputState};
+use itertools::Itertools;
+use line_input::LineInput;
+use ratatui::buffer::Buffer;
+use ratatui::crossterm::event::{KeyCode, KeyEvent};
+use ratatui::layout::Rect;
+use ratatui::prelude::Backend;
+use ratatui::style::Color;
+use ratatui::text::Text;
+use ratatui::widgets::{WidgetRef, Wrap};
+use ratatui::Terminal;
 use ratatui::{
   layout::{Constraint, Direction, Layout},
-  style::Style,
-  widgets::{Paragraph, Wrap},
+  widgets::Paragraph,
 };
-use traits::{EventfulState, StylableWidget};
+use scrollagraph::Scrollagraph;
+use std::marker::PhantomData;
+use traits::{EventfulState, WidgetRefMut};
+use word_choice::{run_choice, ChoiceWidget};
+use word_edit::run_word_edit;
 
 macro_rules! key_event {
   ($code:pat) => {
-    KeyEvent { code: $code, .. }
+    ::ratatui::crossterm::event::KeyEvent { code: $code, .. }
   };
-  ($code:pat, $modifier:pat) => {
-    ::crossterm::event::KeyEvent {
+  ($code:pat, $($modifier:pat),+) => {
+    $(::ratatui::crossterm::event::KeyEvent {
       code: $code,
       modifiers: $modifier,
       ..
-    }
-  };
-  ($code:pat, $modifier0:pat, $($modifiers:pat),+) => {
-    key_event!($code, $modifier0) | key_event!($code, $($modifiers),+)
+    })|+
   };
 }
 
@@ -29,44 +38,211 @@ mod dropdown;
 mod focus;
 mod left_label;
 mod line_input;
+mod scrollagraph;
 mod traits;
+mod word_choice;
 mod word_edit;
 
-pub fn handle_command(
-  workingdb: &mut crate::db::WorkingDatabase,
+fn handle_command<'a, B: Backend>(
+  workingdb: &'a mut WorkingDatabase,
+  terminal: &mut Terminal<B>,
   command: Commands,
-) -> eyre::Result<String> {
-  match command {
+) -> eyre::Result<State<'a>> {
+  let text: Text<'a> = match command {
     Commands::Update {
       sheet_ty,
       sheet_file,
-    } => crate::db::update(workingdb, sheet_ty, sheet_file),
-    Commands::Dump => Ok(crate::db::dump(workingdb)),
-    Commands::Phone { phone } => Ok(crate::db::phone(workingdb, phone)),
-    Commands::Phones {
-      popular_low,
-      popular_high,
-    } => Ok(crate::db::phones(workingdb, popular_low, popular_high)),
-    Commands::Word { word, fuzzy } => {
-      Ok(crate::db::word(workingdb, word, fuzzy))
+    } => crate::db::update(workingdb, sheet_ty, sheet_file)?,
+    Commands::Dump => crate::db::dump(workingdb),
+    Commands::Phone {
+      phone_matching,
+      bounds,
+    } => 'phone: {
+      workingdb.get_phone_map();
+      let mut phones = match crate::db::find_phone(
+        workingdb.unwrap_phone_map(),
+        phone_matching,
+        bounds,
+      ) {
+        Ok(res) => res,
+        Err(err) => {
+          break 'phone Text::styled(format!("regex error {err}"), Color::Red)
+        }
+      };
+
+      phones.sort_by_key(|(phone, _)| *phone);
+
+      return Ok(State::new(ChoiceWidget::new(
+        phones,
+        |(phone, _)| phone,
+        |(_, uuids)| {
+          Paragraph::new(
+            uuids
+              .iter()
+              .map(|uuid| &workingdb.fetch(uuid).unwrap().word.variants[0])
+              .join(" "),
+          )
+          .wrap(Wrap { trim: false })
+        },
+      )));
+    }
+    Commands::Word {
+      word,
+      match_type,
+      pos_guards,
+      edit,
+    } => 'word: {
+      let variant_uuids = match workingdb
+        .find_word(&word, match_type, pos_guards)
+      {
+        Ok(res) => res,
+        Err(err) => {
+          break 'word Text::styled(format!("regex error: {err}"), Color::Red);
+        }
+      };
+      let mut variants = variant_uuids
+        .into_iter()
+        .map(|uuid| (uuid, workingdb.fetch(&uuid).unwrap()))
+        .collect_vec();
+      variants.sort_by_key(|(_, wd)| &wd.word.variants[0]);
+
+      if variants.is_empty() {
+        break 'word Text::styled(
+          format!("found no words which matched {word}"),
+          Color::Red,
+        );
+      }
+
+      if !edit {
+        return Ok(State::new(ChoiceWidget::new(
+          variants
+            .into_iter()
+            .map(|(uuid, wd)| (uuid, wd.word.clone()))
+            .collect_vec(),
+          |(_, word)| word.variants[0].as_str(),
+          |(_, word)| crate::db::format_word(workingdb, &word),
+        )));
+      } else {
+        let Some((target, choice)) = run_choice(
+          variants,
+          |(_, wd)| wd.word.variants[0].as_str(),
+          |(_, wd)| crate::db::format_word(&workingdb, &wd.word),
+          terminal,
+        )?
+        else {
+          break 'word Text::default();
+        };
+
+        let Some(updated) = run_word_edit(Some(&choice.word), terminal)? else {
+          break 'word Text::default();
+        };
+
+        workingdb.update_word(target, updated);
+        crate::db::format_word(
+          &workingdb,
+          &workingdb.fetch(&target).unwrap().word,
+        )
+      }
+    }
+    Commands::New => 'new: {
+      let Some(word) = run_word_edit(None, terminal)? else {
+        break 'new Text::default();
+      };
+
+      let id = workingdb.new_word(word);
+      crate::db::format_word(&workingdb, &workingdb.fetch(&id).unwrap().word)
+    }
+    Commands::Choose => {
+      let choices = workingdb
+        .debug_get_n(12)
+        .into_iter()
+        .map(|uuid| (uuid, workingdb.fetch(&uuid).unwrap()))
+        .collect_vec();
+      let _ = run_choice(
+        choices,
+        |(_, wd)| wd.word.variants[0].as_str(),
+        |(_, wd)| crate::db::format_word(&workingdb, &wd.word),
+        terminal,
+      )?;
+      Text::default()
     }
     Commands::Search { content } => {
-      Ok(crate::db::search_english(workingdb, content))
+      crate::db::search_english(workingdb, content)
     }
     Commands::Flags {
       ignore_terminal_Y,
       ignore_H,
-    } => Ok(crate::db::set_flags(workingdb, ignore_terminal_Y, ignore_H)),
+    } => crate::db::set_flags(workingdb, ignore_terminal_Y, ignore_H),
     _ => unimplemented!(),
+  };
+
+  Ok(State::new_scrollagraph(text))
+}
+
+#[derive(Debug, Default, Clone, Copy)]
+pub struct EmptyWidget {}
+
+impl WidgetRef for EmptyWidget {
+  fn render_ref(&self, _area: Rect, _buf: &mut Buffer) {}
+}
+
+impl<E> EventfulState<E> for EmptyWidget {
+  fn handle_ev(&mut self, event: E) -> Option<E> {
+    Some(event)
   }
 }
 
-pub fn run(db: crate::db::Database) -> eyre::Result<crate::db::Database> {
-  let mut workingdb: crate::db::WorkingDatabase = db.into();
+trait MainviewWidget<'a>: WidgetRefMut + EventfulState<KeyEvent> + 'a {}
+impl<'a, T: WidgetRefMut + EventfulState<KeyEvent> + 'a> MainviewWidget<'a>
+  for T
+{
+}
+
+struct State<'a> {
+  main_widget: Box<dyn MainviewWidget<'a>>,
+  _phantom: PhantomData<&'a dyn MainviewWidget<'a>>,
+}
+
+impl<'a> State<'a> {
+  fn new_empty() -> Self {
+    Self {
+      main_widget: Box::new(EmptyWidget {}),
+      _phantom: PhantomData,
+    }
+  }
+
+  fn new_scrollagraph<T: Into<Text<'a>>>(content: T) -> Self {
+    Self {
+      main_widget: Box::new(Scrollagraph::new(content)),
+      _phantom: PhantomData,
+    }
+  }
+
+  fn new<W: MainviewWidget<'a>>(child: W) -> Self {
+    Self {
+      main_widget: Box::new(child),
+      _phantom: PhantomData,
+    }
+  }
+}
+
+impl<'a> WidgetRefMut for State<'a> {
+  fn render_ref_mut(&mut self, area: Rect, buf: &mut Buffer) {
+    self.main_widget.render_ref_mut(area, buf);
+  }
+}
+
+impl<'a> EventfulState<KeyEvent> for State<'a> {
+  fn handle_ev(&mut self, event: KeyEvent) -> Option<KeyEvent> {
+    self.main_widget.handle_ev(event)
+  }
+}
+
+pub fn run(db: Database) -> eyre::Result<crate::db::Database> {
+  let mut workingdb: WorkingDatabase = db.into();
+  let mut state = State::new_empty();
   let mut terminal = ratatui::init();
-  let mut command_input = LineInputState::default();
-  let mut output = String::new();
-  let mut scroll_y = 0;
+  let mut command_input = LineInput::default_area();
 
   loop {
     terminal.draw(|f| {
@@ -81,52 +257,44 @@ pub fn run(db: crate::db::Database) -> eyre::Result<crate::db::Database> {
       )
       .areas(cmd);
 
-      f.render_widget(
-        Paragraph::new(output.clone())
-          .wrap(Wrap { trim: false })
-          .scroll((scroll_y, 0)),
-        major,
-      );
+      state.render_ref_mut(major, f.buffer_mut());
+
       f.render_widget(Paragraph::new(": "), prompt);
-      f.render_stateful_widget(
-        LineInput::default().style(Style::default()),
-        cmd,
-        &mut command_input,
-      );
+      f.render_widget(&command_input, cmd);
     })?;
-    if let crossterm::event::Event::Key(k) = crossterm::event::read()? {
+    if let ratatui::crossterm::event::Event::Key(k) =
+      ratatui::crossterm::event::read()?
+    {
       match k {
-        key_event!(KeyCode::Up) => {
-          scroll_y = scroll_y.saturating_sub(1);
-        }
-        key_event!(KeyCode::Down) => {
-          scroll_y = scroll_y.saturating_add(1);
-        }
-        key_event!(KeyCode::PageUp) => {
-          scroll_y = scroll_y.saturating_sub(20);
-        }
-        key_event!(KeyCode::PageDown) => {
-          scroll_y = scroll_y.saturating_add(20);
-        }
         key_event!(KeyCode::Enter) => {
           // run command here
-          match crate::parser::parse(command_input.get_str()) {
+          match crate::parser::parse(
+            &std::mem::replace(&mut command_input, LineInput::default_area())
+              .text_area
+              .into_lines()[0],
+          ) {
             Ok(Commands::Quit) => break,
-            Ok(Commands::New) => {
-              word_edit::run_word_edit(&mut workingdb, &mut terminal)?
+            Ok(c) => {
+              std::mem::drop(state);
+              state = handle_command(&mut workingdb, &mut terminal, c)?
             }
-            Ok(c) => output = handle_command(&mut workingdb, c)?,
-            Err(err) => output = format!("{err}"),
+            Err(err) => {
+              state = State::new_scrollagraph(Text::styled(
+                format!("{err}"),
+                Color::Red,
+              ))
+            }
           }
-          command_input.clear();
-          scroll_y = 0;
         }
         ev => {
-          command_input.handle_ev(ev);
+          if let Some(ev) = state.handle_ev(ev) {
+            command_input.handle_ev(ev);
+          }
         }
       }
     }
   }
 
+  std::mem::drop(state);
   Ok(workingdb.into())
 }

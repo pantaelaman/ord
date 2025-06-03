@@ -1,308 +1,264 @@
-use std::{
-  collections::{HashMap, VecDeque},
-  hash::Hash,
-};
-
-use ratatui::{style::Style, widgets::StatefulWidget};
+use ratatui::style::Style;
 
 use super::traits::{EventfulState, StylableWidget};
 
-pub trait Focuser {
-  fn grant_focus(&mut self);
-  fn grant_focus_end(&mut self);
-  fn revoke_focus(&mut self);
-  fn focus_next(&mut self) -> bool;
-  fn focus_prev(&mut self) -> bool;
-  fn set_focus(&mut self, focus: usize);
+pub struct FocusManager<T> {
+  focus_style: Option<Style>,
+  unfocus_style: Option<Style>,
+  chunks: Vec<FocusChunk<T>>,
+  active: Option<usize>,
 }
 
-#[derive(Default)]
-pub struct NamedFocusChain<T: Hash + Eq + Clone, F> {
-  focusers: VecDeque<T>,
-  focuser_map: HashMap<T, F>,
-  focus: Option<usize>,
-}
-
-impl<T: Hash + Eq + Clone, F> NamedFocusChain<T, F> {
-  pub fn new<I: IntoIterator<Item = (T, F)>>(focusers: I) -> Self {
-    let mut order = VecDeque::new();
-    let mut map = HashMap::new();
-    for (name, focuser) in focusers {
-      order.push_back(name.clone());
-      map.insert(name, focuser);
-    }
-    NamedFocusChain {
-      focusers: order,
-      focuser_map: map,
-      focus: None,
+impl<T> Default for FocusManager<T> {
+  fn default() -> Self {
+    Self {
+      focus_style: None,
+      unfocus_style: None,
+      chunks: Vec::new(),
+      active: None,
     }
   }
-
-  pub fn register_focuser(&mut self, key: T, focuser: F) -> Option<F> {
-    self.focuser_map.insert(key, focuser)
-  }
-
-  pub fn insert_focuser_after(&mut self, key: T, after: &T) -> bool {
-    self
-      .focusers
-      .iter()
-      .position(|k| k == after)
-      .map(|idx| self.focusers.insert(idx + 1, key))
-      .is_some()
-  }
-
-  pub fn insert_focuser_at(&mut self, key: T, index: usize) {
-    self.focusers.insert(index, key);
-  }
-
-  pub fn get_focuser(&self, key: &T) -> Option<&F> {
-    self.focuser_map.get(key)
-  }
-
-  pub fn get_focuser_mut(&mut self, key: &T) -> Option<&mut F> {
-    self.focuser_map.get_mut(key)
-  }
-
-  pub fn get_focuser_index(&mut self, index: usize) -> Option<&mut F> {
-    self
-      .focusers
-      .get(index)
-      .cloned()
-      .and_then(|key| self.get_focuser_mut(&key))
-  }
-
-  pub fn remove_focuser(&mut self, key: &T) {
-    self.focusers.retain(|k| k != key);
-  }
 }
 
-impl<T: Hash + Eq + Clone, F: Focuser> NamedFocusChain<T, F> {
-  fn recalc_focus(&mut self) {
-    if let Some(focus) = self.focus {
+#[allow(unused)]
+impl<'t, T: 't + PartialEq> FocusManager<T> {
+  fn is_focused(&self, tag: &T) -> bool {
+    self.active.is_some_and(|idx| tag == &self.chunks[idx].tag)
+  }
+
+  pub fn new_from_existing(&mut self, tag: T) -> FocusableBuilder<T> {
+    self.enable(&tag);
+    FocusableBuilder { tag }
+  }
+
+  pub fn enable(&mut self, tag: &T) {
+    for chunk in self.chunks.iter_mut() {
+      if chunk.tag == *tag {
+        chunk.enabled = true;
+      }
+    }
+
+    if let Some(focus) = self.active {
       self.set_focus(focus);
     }
   }
-}
 
-impl<T: Hash + Eq + Clone, F: Focuser> Focuser for NamedFocusChain<T, F> {
-  fn grant_focus(&mut self) {
-    if !self.focusers.is_empty() {
-      self.set_focus(0);
-    }
-  }
-
-  fn grant_focus_end(&mut self) {
-    if !self.focusers.is_empty() {
-      self.set_focus(self.focusers.len() - 1);
-    }
-  }
-
-  fn revoke_focus(&mut self) {
-    self.focus = None;
-  }
-
-  fn focus_next(&mut self) -> bool {
-    if let Some(focus) = self.focus {
-      let focuser = self.get_focuser_index(focus).unwrap();
-      if focuser.focus_next() {
-        focuser.revoke_focus();
-        *self.focus.as_mut().unwrap() += 1;
-        let res = self.focus.unwrap() > self.focusers.len();
-        *self.focus.as_mut().unwrap() %= self.focusers.len();
-        self
-          .get_focuser_index(self.focus.unwrap())
-          .unwrap()
-          .grant_focus();
-        res
-      } else {
-        false
+  pub fn disable(&mut self, tag: &T) {
+    for chunk in self.chunks.iter_mut() {
+      if chunk.tag == *tag {
+        chunk.enabled = false;
       }
-    } else {
-      true
+    }
+
+    if let Some(focus) = self.active {
+      self.set_focus(focus);
     }
   }
 
-  fn focus_prev(&mut self) -> bool {
-    if let Some(focus) = self.focus {
-      let focuser = self.get_focuser_index(focus).unwrap();
-      if focuser.focus_prev() {
-        focuser.revoke_focus();
-        let res = if focus > 0 {
-          *self.focus.as_mut().unwrap() -= 1;
-          false
-        } else {
-          *self.focus.as_mut().unwrap() = self.focusers.len() - 1;
-          true
-        };
-        self
-          .get_focuser_index(self.focus.unwrap())
-          .unwrap()
-          .grant_focus_end();
-        res
-      } else {
-        false
+  pub fn disable_if<F>(&mut self, condition: F)
+  where
+    F: Fn(&T) -> bool,
+  {
+    for chunk in self.chunks.iter_mut() {
+      if condition(&chunk.tag) {
+        chunk.enabled = false;
       }
-    } else {
-      true
     }
   }
 
-  fn set_focus(&mut self, focus: usize) {
-    self.focus = Some(focus % self.focusers.len());
-    self
-      .get_focuser_index(self.focus.unwrap())
-      .map(|f| f.grant_focus());
+  pub fn handle_ev<E, I>(&self, ev: E, targets: I) -> Option<E>
+  where
+    E: 't,
+    I: IntoIterator<Item = &'t mut dyn TaggedEventful<T, E>>,
+  {
+    let Some(focused_tag) = self.active.map(|idx| &self.chunks[idx].tag) else {
+      return Some(ev);
+    };
+    targets
+      .into_iter()
+      .filter(|target| target.get_tag() == focused_tag)
+      .try_fold(ev, |ev, target| target.handle_ev(ev))
   }
 }
 
-#[derive(Default, Debug)]
-pub struct FocusManager {
-  next_id: usize,
-  pub focus: Option<usize>,
-  focus_style: Option<Style>,
-  unfocus_style: Option<Style>,
-}
-
-impl FocusManager {
+impl<T> FocusManager<T> {
   pub fn focus_style<S: Into<Style>>(self, style: S) -> Self {
-    FocusManager {
+    Self {
       focus_style: Some(style.into()),
       ..self
     }
   }
 
   pub fn unfocus_style<S: Into<Style>>(self, style: S) -> Self {
-    FocusManager {
+    Self {
       unfocus_style: Some(style.into()),
       ..self
     }
   }
 
-  pub fn new_child<S>(&mut self, child_state: S) -> FocusableState<S> {
-    let state = FocusableState {
-      focus_id: self.next_id,
-      focus_style: self.focus_style.clone(),
-      unfocus_style: self.unfocus_style.clone(),
-      child_state,
-    };
-    self.next_id += 1;
-    state
-  }
-}
-
-impl Focuser for FocusManager {
-  fn grant_focus(&mut self) {
-    if self.next_id > 0 {
-      self.focus = Some(0);
-    }
-  }
-
-  fn grant_focus_end(&mut self) {
-    if self.next_id > 0 {
-      self.focus = Some(self.next_id - 1);
-    }
-  }
-
-  fn revoke_focus(&mut self) {
-    self.focus = None;
-  }
-
-  fn focus_next(&mut self) -> bool {
-    if let Some(f) = self.focus.as_mut() {
-      *f += 1;
-      let res = *f >= self.next_id;
-      *f %= self.next_id;
-      res
-    } else {
+  pub fn set_focus(&mut self, focus: usize) -> bool {
+    if let Some((idx, _)) = self
+      .chunks
+      .iter()
+      .enumerate()
+      .filter(|(_, chunk)| chunk.enabled)
+      .nth(focus)
+    {
+      self.active = Some(idx);
       true
+    } else {
+      false
     }
   }
 
-  fn focus_prev(&mut self) -> bool {
-    if let Some(f) = self.focus.as_mut() {
-      if *f == 0 {
-        *f = self.next_id - 1;
-        true
-      } else {
-        *f -= 1;
-        false
+  pub fn next(&mut self) -> bool {
+    if let Some(idx) = self.active {
+      for (new_idx, attempt) in self
+        .chunks
+        .iter()
+        .enumerate()
+        .cycle()
+        .skip(idx + 1)
+        .take(self.chunks.len())
+      {
+        if attempt.enabled {
+          self.active = Some(new_idx);
+          return true;
+        }
       }
-    } else {
-      true
+      self.active = None;
+    }
+    false
+  }
+
+  pub fn prev(&mut self) -> bool {
+    if let Some(idx) = self.active {
+      for (new_idx, attempt) in self
+        .chunks
+        .iter()
+        .enumerate()
+        .rev()
+        .cycle()
+        .skip(self.chunks.len() - idx)
+        .take(self.chunks.len())
+      {
+        if attempt.enabled {
+          self.active = Some(new_idx);
+          return true;
+        }
+      }
+      self.active = None;
+    }
+    false
+  }
+}
+
+impl<T: Clone> FocusManager<T> {
+  pub fn new_child(&mut self, tag: T) -> FocusableBuilder<T> {
+    self.chunks.push(FocusChunk {
+      enabled: true,
+      tag: tag.clone(),
+    });
+    FocusableBuilder { tag }
+  }
+
+  pub fn new_hidden_child(&mut self, tag: T) -> FocusableBuilder<T> {
+    self.chunks.push(FocusChunk {
+      enabled: false,
+      tag: tag.clone(),
+    });
+    FocusableBuilder { tag }
+  }
+}
+
+struct FocusChunk<T> {
+  enabled: bool,
+  tag: T,
+}
+
+pub struct FocusableBuilder<T> {
+  tag: T,
+}
+
+impl<T> FocusableBuilder<T> {
+  pub fn with_state<S>(self, state: S) -> Focusable<T, S> {
+    Focusable {
+      tag: self.tag,
+      state,
     }
   }
+}
 
-  fn set_focus(&mut self, focus: usize) {
-    self.focus = Some(focus % self.next_id);
+pub struct Focusable<T, S> {
+  tag: T,
+  pub state: S,
+}
+
+impl<T, S> Focusable<T, S> {
+  pub fn into_inner(self) -> S {
+    self.state
   }
 }
 
-pub struct FocusableState<S> {
-  pub focus_style: Option<Style>,
-  pub unfocus_style: Option<Style>,
-  pub focus_id: usize,
-  child_state: S,
+impl<T: PartialEq, S> Focusable<T, S> {
+  pub fn has_focus(&self, fmanager: &FocusManager<T>) -> bool {
+    fmanager.is_focused(&self.tag)
+  }
+
+  pub fn widget<W: StylableWidget>(
+    &self,
+    mut widget: W,
+    fmanager: &FocusManager<T>,
+  ) -> W {
+    if self.has_focus(fmanager) {
+      widget.focus_style(fmanager.focus_style, true);
+    } else {
+      widget.focus_style(fmanager.unfocus_style, false);
+    }
+    widget
+  }
 }
 
-impl<S> std::ops::Deref for FocusableState<S> {
+impl<T: PartialEq, S: StylableWidget> Focusable<T, S> {
+  pub fn internal_widget(&mut self, fmanager: &FocusManager<T>) -> &S {
+    if self.has_focus(fmanager) {
+      self.state.focus_style(fmanager.focus_style, true);
+    } else {
+      self.state.focus_style(fmanager.unfocus_style, false);
+    }
+    &self.state
+  }
+}
+
+impl<T, S> std::ops::Deref for Focusable<T, S> {
   type Target = S;
 
   fn deref(&self) -> &Self::Target {
-    &self.child_state
+    &self.state
   }
 }
 
-impl<S> std::ops::DerefMut for FocusableState<S> {
+impl<T, S> std::ops::DerefMut for Focusable<T, S> {
   fn deref_mut(&mut self) -> &mut Self::Target {
-    &mut self.child_state
+    &mut self.state
   }
 }
 
-impl<E, S: EventfulState<E>> EventfulState<E>
-  for (&mut FocusableState<S>, &FocusManager)
-{
+pub trait TaggedState<T> {
+  fn get_tag(&self) -> &T;
+}
+
+impl<T, S> TaggedState<T> for Focusable<T, S> {
+  fn get_tag(&self) -> &T {
+    &self.tag
+  }
+}
+
+impl<E, T, S: EventfulState<E>> EventfulState<E> for Focusable<T, S> {
   fn handle_ev(&mut self, event: E) -> Option<E> {
-    let (fstate, fmanager) = self;
-
-    if fmanager.focus.is_some_and(|focus| fstate.focus_id == focus) {
-      fstate.child_state.handle_ev(event)
-    } else {
-      Some(event)
-    }
+    self.state.handle_ev(event)
   }
 }
 
-pub struct Focusable<'a, W: StatefulWidget> {
-  widget: W,
-  state: &'a mut FocusableState<<W as StatefulWidget>::State>,
-}
-
-impl<'a, W: StatefulWidget> Focusable<'a, W> {
-  pub fn new(
-    state: &'a mut FocusableState<<W as StatefulWidget>::State>,
-    widget: W,
-  ) -> Self {
-    Focusable { widget, state }
-  }
-}
-
-impl<'a, W: StatefulWidget + StylableWidget> StatefulWidget
-  for Focusable<'a, W>
-{
-  type State = &'a FocusManager;
-
-  fn render(
-    self,
-    area: ratatui::prelude::Rect,
-    buf: &mut ratatui::prelude::Buffer,
-    fmanager: &mut Self::State,
-  ) {
-    let widget = if fmanager.focus.is_some_and(|f| self.state.focus_id == f) {
-      self.widget.focus_style(self.state.focus_style, true)
-    } else {
-      self.widget.focus_style(self.state.unfocus_style, false)
-    };
-
-    widget.render(area, buf, &mut self.state.child_state);
-  }
-}
+pub trait TaggedEventful<T, E>: TaggedState<T> + EventfulState<E> {}
+impl<T, E, F: TaggedState<T> + EventfulState<E>> TaggedEventful<T, E> for F {}

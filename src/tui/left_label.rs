@@ -1,4 +1,5 @@
 use ratatui::{
+  buffer::Buffer,
   layout::Rect,
   style::Style,
   widgets::{StatefulWidget, Widget},
@@ -9,6 +10,7 @@ use super::traits::StylableWidget;
 pub struct LeftLabelled<W> {
   label: String,
   style: Option<Style>,
+  width: Option<u16>,
   child: W,
 }
 
@@ -18,16 +20,36 @@ impl<W> LeftLabelled<W> {
       label: label.into(),
       child,
       style: None,
+      width: None,
+    }
+  }
+
+  pub fn width(self, width: u16) -> Self {
+    Self {
+      width: Some(width),
+      ..self
+    }
+  }
+
+  fn render_label(&self, area: Rect, buf: &mut Buffer) -> Rect {
+    buf.set_string(area.x, area.y, &self.label, self.style.unwrap_or_default());
+    let offset =
+      std::cmp::max(self.label.len() as u16 + 1, self.width.unwrap_or(0));
+    Rect {
+      x: area.x + offset,
+      width: area.width - offset,
+      ..area
     }
   }
 }
 
 impl<W: StylableWidget> StylableWidget for LeftLabelled<W> {
-  fn style(self, style: Style) -> Self {
-    Self {
-      child: self.child.style(style),
-      ..self
-    }
+  fn style(&mut self, style: Style) {
+    self.child.style(style);
+  }
+
+  fn focus_style(&mut self, style: Option<Style>, focused: bool) {
+    self.child.focus_style(style, focused);
   }
 }
 
@@ -39,16 +61,8 @@ impl<W: Widget> Widget for LeftLabelled<W> {
   ) where
     Self: Sized,
   {
-    buf.set_string(area.x, area.y, &self.label, self.style.unwrap_or_default());
-    let offset = self.label.len() as u16 + 1;
-    self.child.render(
-      Rect {
-        x: area.x + offset,
-        width: area.width - offset,
-        ..area
-      },
-      buf,
-    );
+    let area = self.render_label(area, buf);
+    self.child.render(area, buf);
   }
 }
 
@@ -61,16 +75,7 @@ impl<W: StatefulWidget> StatefulWidget for LeftLabelled<W> {
     buf: &mut ratatui::prelude::Buffer,
     state: &mut Self::State,
   ) {
-    buf.set_string(area.x, area.y, &self.label, self.style.unwrap_or_default());
-    let offset = self.label.len() as u16 + 1;
-    self.child.render(
-      Rect {
-        x: area.x + offset,
-        width: area.width - offset,
-        ..area
-      },
-      buf,
-      state,
-    );
+    let area = self.render_label(area, buf);
+    self.child.render(area, buf, state);
   }
 }
