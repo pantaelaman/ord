@@ -1,0 +1,13 @@
+{
+  "id": "OrdLocale",
+  "name": "Ørd Locale",
+  "author": ["Pantaelaman"],
+  "description": "Provides the locale for Ørd",
+  "prefix": "OrdLocale",
+  "main_file": "main.lua",
+  "dependencies": [
+    "Steamodded (>=1.*)",
+    "Lovely (>=0.6)"
+  ],
+  "version": "1.0.0"
+}
