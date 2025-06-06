@@ -5246,3 +5246,353 @@
 	WAVEDASH_PAGE5_INFO2=			{#ff0000}Vi du får ike myke frastor{#}{n}du begynner {~}for inær{/~} fra jørþet.
 
 	WAVEDASH_PAGE6_TITLE=			Hyralig Byljestrikker!
+
+
+# -- Everest Translations --
+# Copied directly from Everest Github
+
+# NOTES:
+# The # Symbol at the start of a line counts as a Comment. To include in dialog, use a \#
+# The . Symbol will cause a pause unless escaped with \. (ex: Mr. Oshiro has a pause, Mr\. Oshiro does not)
+# Newlines automatically create a Page Break, unless there is an {n} command on the previous line
+# Commands: Anything inside of curly braces {...} is a command and should not be translated.
+
+# Inline Text Commands:
+# {~}wavy text{/~}
+# {!}impact text{/!}
+# {>> x}changes speed at which characters are displayed{>>}
+# {# 000000}this text is black{#} (uses HEX color values)
+# {+MENU_BEGIN} inserts the dialog from the MENU_BEGIN value (in English, "CLIMB")
+# {n} creates a newline, without a page break
+# {0.5} creates a 0.5 second pause
+# {big}this text is large{/big}
+
+# Gameplay Control Commands (should never change)
+# {trigger x} this triggers an in-game event
+# {anchor} controls the visual position of the textbox in-game
+
+# Helper Postcards
+	POSTCARD_LEVELGONE= 		{big}Takk ((player))!{/big}{n}Ned jort {#ff1144}((sid)){#} uter munsom fjell.
+	POSTCARD_LEVELLOADFAILED= 	{big}Fullga!{/big}{n}Ned {#ff1144}((sid)){#} feilet laster.{n}Overprover dytt {#44adf7}log.txt{#} fer feilsmådeler, eh na søgner denne feilet tro mappskrivenær ur nøn vitingsom, dœtrœster fœster det!
+	POSTCARD_LEVELNOSPAWN= 		{big}Uups!{/big}{n}Nøn verlet dytt {#44adf7}begynnutning!{#}{n}Œgi overprover vi dytt mappet{n}har aþil {#44adf7}Player{#}.
+	POSTCARD_BADTILEID=			{big}Uups!{/big}{n}Yr unnbœdyddet ((type))fliser id {#ff1144}((id)){#} ad{n}{#ff1144}(((x)), ((y))){#} uttro rommet {#ff1144}((room)){#}{n}Overprover dytt {#44adf7}log.txt{#} fer mer info.
+	POSTCARD_DECALREGERROR=		{big}Uups!{/big}{n}Yr feil na søkrer tro {n}{#ff1144}((property)){#} egnt utopp {#ff1144}((decal)){#}{n}Du œgi har bort ur igildebar egnt uttro dytt {#44adf7}Decal Registry{#}.
+	POSTCARD_MISSINGTUTORIAL=	{big}Uups!{/big}{n}Ka ike finner eta lekebak dålœsk {#ff1144}((tutorial)){#}.{n}Overprover dytt {#44adf7}log.txt{#} fer mer info.
+	POSTCARD_TILEXMLERROR=		{big}Uups!{/big}{n}Yr feil na grejner flisersveit ad {#ff1144}((path)){#}{n}Overprover dytt {#44adf7}log.txt{#} fer mer info.
+	POSTCARD_XMLERROR=			{big}Uups!{/big}{n}{#ff1144}((path)){#} har språklohvefeil.{n}Overprover dytt {#44adf7}log.txt{#} fer mer info.
+	POSTCARD_BOSSLASTNODEHIT=	{big}Uups!{/big}{n}Sjupter aþilet {#ff1144}Badeline Boss{#} na det ytt uttro sint siþra utninget, œgi lejer tro en blivig utning utfra natidig rommet fer dœtrœster lekenær ka ike sjupter det.
+	POSTCARD_LEVELNOROOMS=		{big}Uups!{/big}{n}Denne mappet har {#f94a4a}inøn rommer{#}!{n}Œgi dœtrœster dytt mappet har{n}{#44adf7}minst en rom{#}, eh {n}du rænvakket det nalangt skaper det.
+
+# Main Menu
+	MENU_TITLETOUCH= 		ÞRYKKER
+	MENU_MAPLIST= 			Mapplist
+	MENU_MODOPTIONS= 		Moddvœlginger
+	MENU_PAUSE_MODOPTIONS= 	Moddvœlginger
+
+	MENU_MODOPTIONS_UPDATE_FAILED=				Feilet innlejer Everest Oppdoring
+	MENU_MODOPTIONS_ONE_MOD_FAILEDTOLOAD=		1 modd feilet laster
+	MENU_MODOPTIONS_MULTIPLE_MODS_FAILEDTOLOAD=	{0} modder feilet laster
+	MENU_MODOPTIONS_EVEREST_YAML_ERRORS=		everest.yaml lastefeiler hjytt
+	MENU_MODOPTIONS_UPDATE_AVAILABLE=			Everest Oppdoring yr vœlgebar
+	MENU_MODOPTIONS_MOD_UPDATE_AVAILABLE=		Oppdoring yr vœlgebar til 1 modd
+	MENU_MODOPTIONS_MOD_UPDATES_AVAILABLE=		Oppdoringer yr vœlgebare til {0} modder
+
+# Title Screen
+	MENU_TITLESCREEN_RESTART_VANILLA= Enabegynner tro orig/Celeste.exe
+	MENU_TITLESCREEN_RESTART_VANILLA_SAVES_WARN= VARSEL: Fedra OS grenser, skal ike deler rænvakkinger!
+
+# Extra Key Mapping
+    KEY_CONFIG_ADDING= ÞRYKKER EBLIVIG NAPP FER
+    KEY_CONFIG_ADDITION_HINT= Þrykker LØFTER + BŒKREFTER fer lejer tro yr tar fra eblivig napper
+
+# Mod Options
+	MODOPTIONS_TITLE= 										EVEREST
+	MODOPTIONS_NEEDSRELAUNCH=								Må begynner fer har ahrif
+
+# Core Module Options
+	MODOPTIONS_COREMODULE_UPDATE= 							Oppdor Everest tro ((version))
+	MODOPTIONS_COREMODULE_DOWNLOADDEPS= 					Innlejer Bort Frahengter
+	MODOPTIONS_COREMODULE_VERSIONLIST= 						Œnner Everest Urgave
+	MODOPTIONS_COREMODULE_LEGACYREF=						Fremdor legacyRef innlejer
+	MODOPTIONS_COREMODULE_LEGACYREF_DESCR=					Þrynget fer bygger i-Core kode modder vœd .NET Core Everest
+	MODOPTIONS_COREMODULE_TITLE= 							Everest Core
+	MODOPTIONS_COREMODULE_DEBUGMODE= 						Frabuggeham
+	MODOPTIONS_COREMODULE_LAUNCHWITHFMODLIVEUPDATE= 		Fraløfter v/ FMOD Virig Oppdor
+	MODOPTIONS_COREMODULE_LAUNCHWITHOUTINTRO= 				Fraløfter ivœd Intro
+	MODOPTIONS_COREMODULE_SHOWMODOPTIONSINGAME=				Visjar Moddvœlginger uttro Spill
+	MODOPTIONS_COREMODULE_SHOWEVERESTTITLESCREEN=			Visjar Everest Titœllskjerm
+	MODOPTIONS_COREMODULE_INPUTGUI= 						Napper Fremspyringer
+	MODOPTIONS_COREMODULE_INPUTGUI_= 						AUTO
+	MODOPTIONS_COREMODULE_INPUTGUI_KEYBOARD= 				ÞRYKKEBORD
+	MODOPTIONS_COREMODULE_INPUTGUI_NS= 						SWITCH
+	MODOPTIONS_COREMODULE_INPUTGUI_NS_LEFTJOYCON= 			SWITCH V
+	MODOPTIONS_COREMODULE_INPUTGUI_NS_RIGHTJOYCON= 			SWITCH H
+	MODOPTIONS_COREMODULE_INPUTGUI_PS4= 					PS4
+	MODOPTIONS_COREMODULE_INPUTGUI_XB1= 					XBONE
+	MODOPTIONS_COREMODULE_INPUTGUI_TOUCH= 					ÞRYKKER
+	MODOPTIONS_COREMODULE_MAINMENUMODE= 					Hovtmenyham
+	MODOPTIONS_COREMODULE_MAINMENUMODE_= 					VANIL
+	MODOPTIONS_COREMODULE_MAINMENUMODE_ROWS= 				RØÞER
+	MODOPTIONS_COREMODULE_MAINMENUMODE_TOUCH= 				ÞRYKKER
+	MODOPTIONS_COREMODULE_COMPATMODE=						Sammebarham
+	MODOPTIONS_COREMODULE_COMPATMODE_NONE=					INØN
+	MODOPTIONS_COREMODULE_COMPATMODE_NONE_DESCR_A=
+	MODOPTIONS_COREMODULE_COMPATMODE_NONE_DESCR_B=
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYXNA=				GAM XNA
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYXNA_DESCR_A=		Enatroliggjer eta 61 FPS XNA urþiþ
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYXNA_DESCR_B=		NURLIG FRASJUPTET VI DENNE ERFIÞERET HAR AHRIF TRO DU!
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYFNA=				GAM FNA
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYFNA_DESCR_A=		Enatroliggjer gam FNA's eblivig innlejer stortidasje
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYFNA_DESCR_B=		NURLIG FRASJUPTET VI DU HAR GAM VØÞVIENAVITENÆR!
+	MODOPTIONS_COREMODULE_COMPATMODE_INCOMPATIBLE=			Varsel: Isammebar tro grunnrammet til dytt vanil innlejing!
+	MODOPTIONS_COREMODULE_D3D11EXCLUSIVEFULLSCREEN=			Brykker Nurlig Hœlskjerm
+	MODOPTIONS_COREMODULE_D3D11EXCLUSIVEFULLSCREEN_DESC=	Har ahrif tro eta D3D11 visjarenær utopp Windows
+	MODOPTIONS_COREMODULE_AUTOUPDATEMODSONSTARTUP=			Auto Oppdor Modder na Begynning
+	MODOPTIONS_COREMODULE_MODUPDATES= 						Overprover fer Moddoppdoringer
+	MODOPTIONS_COREMODULE_USEKEYBOARDFORTEXTINPUT=			Brykker Þrykkebord fer Tekstinnlejing
+	MODOPTIONS_COREMODULE_WARNONEVERESTYAMLERRORS=			Gaver Varsel meda everest.yaml Feiler
+	MODOPTIONS_COREMODULE_WARNONEVERESTYAMLERRORS_DESC=		Brykkeful fer moddskapenær
+	MODOPTIONS_COREMODULE_COLORIZEDLOGGING=			        Dœfærget Konsoll Søgninger
+    MODOPTIONS_COREMODULE_COLORIZEDLOGGING_DESC=		    Brykkeful fer moddskapenær
+	MODOPTIONS_COREMODULE_MENUNAV_SUBHEADER=				MENY SIGLAR
+	MODOPTIONS_COREMODULE_MENUPAGEUP=						Sid Opp uttro Menyer
+	MODOPTIONS_COREMODULE_MENUPAGEDOWN=						Sid Ræn uttro Menyer
+	MODOPTIONS_COREMODULE_DEBUGMODE_SUBHEADER=				FRABUGGEHAM
+	MODOPTIONS_COREMODULE_TOGGLEDEBUGCONSOLE=				Œnner Frabuggekonsoll
+	MODOPTIONS_COREMODULE_DEBUGCONSOLE=						Åpner Frabuggerkonsoll
+	MODOPTIONS_COREMODULE_DEBUGMAP=							Frabuggemapp
+	MODOPTIONS_COREMODULE_MOUNTAINCAM_SUBHEADER=			OVERJØRÞFJELLKAMERA
+	MODOPTIONS_COREMODULE_CAMERAFORWARD=					Kamera Frem
+	MODOPTIONS_COREMODULE_CAMERABACKWARD=					Kamera Bak
+	MODOPTIONS_COREMODULE_CAMERARIGHT=						Kamera Høyre
+	MODOPTIONS_COREMODULE_CAMERALEFT=						Kamera Venstre
+	MODOPTIONS_COREMODULE_CAMERAUP=							Kamera Opp
+	MODOPTIONS_COREMODULE_CAMERADOWN=						Kamera Ræn
+	MODOPTIONS_COREMODULE_CAMERASLOW=						Kamera Stortidig
+	MODOPTIONS_COREMODULE_CAMERAPRINT=						Søgner Kameras Utning
+	MODOPTIONS_COREMODULE_TOGGLEMOUNTAINFREECAM=			Œnner Viþrakamera
+	MODOPTIONS_COREMODULE_SOUNDTEST= 						Lødproving
+	MODOPTIONS_COREMODULE_OOBE= 							Enador Første Opplejing
+	MODOPTIONS_COREMODULE_TOGGLEMODS=						Tar Modder Tro ur Fra
+
+	MODOPTIONS_COREMODULE_DISCORDRICHPRESENCE=				Discord Riknalangnehet
+	MODOPTIONS_COREMODULE_DISCORDRICHPRESENCEOPTIONS=		Riknalangnehet Vœlginger
+	MODOPTIONS_COREMODULE_DISCORDSHOWICON=					Visjar Ikon
+	MODOPTIONS_COREMODULE_DISCORDSHOWMAP=					Visjar Mapp
+	MODOPTIONS_COREMODULE_DISCORDSHOWSIDE=					Visjar Sid (A, B...)
+	MODOPTIONS_COREMODULE_DISCORDSHOWROOM=					Visjar Romnavn
+	MODOPTIONS_COREMODULE_DISCORDSHOWBERRIES=				Visjar Bærgang
+	MODOPTIONS_COREMODULE_DISCORDSHOWDEATHS=				Visjar Dørgang
+	MODOPTIONS_COREMODULE_DISCORDFAILED=					Ka ike fœster tro Discord. Tar fra e bak tro fer enaprover.
+	
+	MODOPTIONS_COREMODULE_PSOPTIONS=						Everest Fotofylesomham Vœlginger
+	MODOPTIONS_COREMODULE_PSOPTIONS_DESC=					Trogår œnner deler til Fotofylesomham. Everest lejet denne tro.
+	MODOPTIONS_COREMODULE_PSDISTORT=						Angst & Smøring Ahrifer
+	MODOPTIONS_COREMODULE_PSDISTORT_DESC=					Kontroller smøringahrif mœd skaper na går nær Jaggenær.
+	MODOPTIONS_COREMODULE_PSGLITCH=							Størungahrifer
+	MODOPTIONS_COREMODULE_PSGLITCH_DESC=					Kontroller størungahrifer til œnning tro Hjerkant ad Farvel.
+	MODOPTIONS_COREMODULE_PSLIGHTNING=						Troig Blitsblittinger
+	MODOPTIONS_COREMODULE_PSLIGHTNING_DESC=					Kontroller vi strommet til Farvel skal blitter troiglig.
+	MODOPTIONS_COREMODULE_PSSCREENFLASH=					Skjermblitser
+	MODOPTIONS_COREMODULE_PSSCREENFLASH_DESC=				Kontroller vi skjermet ka blitter tro hvit, tæn na tar hjertrœhtenær tro.
+	MODOPTIONS_COREMODULE_PSTEXTHIGHLIGHT=					Teksthøylys
+	MODOPTIONS_COREMODULE_PSTEXTHIGHLIGHT_DESC=				Kontroller vi tekst skal blitter tro munsom færg na vœlger.
+	
+
+	MODOPTIONS_COREMODULE_MIRRORPREFERENCES=				Brykker Spegel Typalig
+	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_GB=				Tatt Fra
+	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_JADE=			Germany
+	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_WEGFAN=			China
+	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_OTOBOT=			North America
+
+	MODOPTIONS_COREMODULE_NOTLOADED_A= 						Nøne modder feilet laster.
+	MODOPTIONS_COREMODULE_NOTLOADED_B= 						Œgi overprover dytt log.txt fer mer info.
+	MODOPTIONS_COREMODULE_NOTLOADED_NOTFOUND= 				finnet ike {0}
+	MODOPTIONS_COREMODULE_NOTLOADED_ASMLOADERROR=			moddbyggne feilet laster
+	MODOPTIONS_COREMODULE_YAMLERRORS= 						Ka ike laster nøn everest.yaml filer.
+
+	MODOPTIONS_COREMODULE_SEARCHBOX_PLACEHOLDER=			Þrykker 'Tab' ur 'Vœlger' fer går nehst samsvar
+
+	MODOPTIONS_VANILLATRISTATE_NEVER=						FRA
+	MODOPTIONS_VANILLATRISTATE_EVEREST=						EVEREST
+	MODOPTIONS_VANILLATRISTATE_ALWAYS=						ALLTID
+
+# Sound Test
+	SOUNDTEST_TITLE=	LØDPROVING
+	SOUNDTEST_AUDIOPARAMS_OPEN_1=	Þrykker
+	SOUNDTEST_AUDIOPARAMS_OPEN_2=	fer aþdor Audiovœlginger
+	SOUNDTEST_AUDIOPARAMS=	Audiovœlginger
+
+# Maplist
+	MAPLIST_TITLE= 			MAPPLIST
+	MAPLIST_FILTERS= 		Sivenærer
+	MAPLIST_TYPE= 			Fra
+	MAPLIST_TYPE_ALLMODS= 	Alle Modder
+	MAPLIST_SIDE= 			Sid
+	MAPLIST_LIST= 			Mapper
+	MAPLIST_UNCATEGORIZED= 	Ivœd tip
+	MAPLIST_SEARCH=			Søkrer
+	MAPLIST_SEARCH_MATCH=	Småtidig Samsvar
+	MAPLIST_TYPE_EVERYTHING=  Alle
+	MAPLIST_RESULTS_SINGULAR= Finnet {0} frafalling
+	MAPLIST_RESULTS_PLURAL=   Finnet {0} frafallinger
+
+	LEVELSET_CELESTE= 		Celeste
+	LEVELSET_= 				Ivœd tip
+
+# Updater
+	UPDATER_TITLE= 					OPPDORENÆR
+	UPDATER_LEGACYREF_TITLE=		LEGACYREF OPPLEJING
+	UPDATER_VERSIONS_TITLE= 		ŒNNER EVEREST URGAVE
+	UPDATER_VERSIONS_CURRENT= 		Innlejet: ((version))
+	UPDATER_VERSIONS_REQUESTING= 	Enafrisker...
+
+	UPDATER_VERSIONS_WAIT_REQUEST=	Vænter urgavelist spyring...
+	UPDATER_VERSIONS_ERR_DOWNLOAD= 	Feilet innlaster urgavelist.
+	UPDATER_VERSIONS_ERR_FORMAT= 	Unnvitet tip.
+
+	UPDATER_CURRENT_BRANCH=			Natidig hvejgg
+
+	UPDATER_SRC_STABLE=				STABIL
+	UPDATER_SRC_BETA=				BETA
+	UPDATER_SRC_DEV=				DEV
+	UPDATER_SRC_CORE=				SENTRUM
+
+	UPDATER_SRC_RELEASE_GITHUB=		Tagget urgaver (GitHub)
+	UPDATER_SRC_BUILDBOT_AZURE=		Auto byggner (Azure)
+
+# currently unused
+	UPDATER_SRC_BUILDBOT= 			Auto byggner
+
+# Everest Updater
+	EVERESTUPDATER_NOTSUPPORTED=	Støtter ike oppdor utopp denne masjinet - frakutter.
+	EVERESTUPDATER_NOUPDATE=		Inøn oppdoring - frakutter.
+	EVERESTUPDATER_CREATINGLEGACYREF=	Skaper grunn legacyRef innlejing
+	EVERESTUPDATER_NOTAVAILABLE=	Þrynget Everest byggne ike vœlgebar!
+	EVERESTUPDATER_UPDATING=		Oppdor tro {0} (hvejgg: {1}) @ {2}
+	EVERESTUPDATER_DOWNLOADING=		Innlaster
+	EVERESTUPDATER_DOWNLOADING_PROGRESS=		Innlaster:
+	EVERESTUPDATER_DOWNLOADFAILED=	Feilet innlaster!
+	EVERESTUPDATER_DOWNLOADFINISHED=	Fuldyd innlaster.
+	EVERESTUPDATER_EXTRACTING=		Unnpakner .zip til oppdoring
+	EVERESTUPDATER_ZIPENTRIES=		listdeler
+	EVERESTUPDATER_EXTRACTIONFAILED=	Feilet unnpakner!
+	EVERESTUPDATER_EXTRACTIONFINISHED=	Fuldyd unnpakner.
+	EVERESTUPDATER_RESTARTING=		Enabegynner
+	EVERESTUPDATER_RESTARTINGIN=	Enabegynner na {0}
+	EVERESTUPDATER_WAITFORINSTALLER=	Vænter innlejenær fuldor
+	EVERESTUPDATER_INSTALLERFAILED=	Innlejenær feilet: latetagg {0}
+	EVERESTUPDATER_STARTINGFAILED=	Feilet begynner innlejenær!
+	EVERESTUPDATER_ERRORHINT1=		Œgi skaper ny erfiþer utopp GitHub @ https://github.com/EverestAPI/Everest
+	EVERESTUPDATER_ERRORHINT2=		ur innsammer eta #modding_help sjåutning utopp Discord (innlåding ad repoet).
+	EVERESTUPDATER_ERRORHINT3=		Dœtrœster opplaster dytt log.txt
+
+# Mod Updater
+	MODUPDATECHECKER_MENU_TITLE=	MODDOPPDORINGER
+	MODUPDATECHECKER_NOUPDATE=		Inøn opdoring vœlgebar
+	MODUPDATECHECKER_MENU_HEADER=	Vœlgebare Oppdoring
+	MODUPDATECHECKER_FETCHING=		Overprover tro Oppdoring...
+	MODUPDATECHECKER_ERROR=			Feilet overprover tro oppdoring.
+	MODUPDATECHECKER_UPDATED=		oppdyd
+	MODUPDATECHECKER_DOWNLOADING=	innlaster...
+	MODUPDATECHECKER_INSTALLING=	innlejer...
+	MODUPDATECHECKER_FAILED=		feilet oppdor!
+	MODUPDATECHECKER_CANCELLING=	frakutter oppdor...
+	MODUPDATECHECKER_CANCELLED=		frakutter oppdoring
+	MODUPDATECHECKER_WILLRESTART=	þrykker Bak fer enabegynner Celeste
+	MODUPDATECHECKER_UPDATE_ALL=	Oppdor alle modder
+	MODUPDATECHECKER_UPDATE_ALL_INPROGRESS=	Oppdor alle modder...
+	MODUPDATECHECKER_UPDATE_ALL_DONE=	Oppdyd alle modder.
+	MODUPDATECHECKER_RESTARTNEEDED= Celeste þrynger enabegynner fer fremsetter.
+	MODUPDATECHECKER_MENU_HEADER_RESTART= Vœlger doring
+	MODUPDATECHECKER_SHUTDOWN= Later
+	MODUPDATECHECKER_RESTART= Enabegynner
+
+# Auto Mod Updater
+	AUTOUPDATECHECKER_CHECKING=		Overprover tro moddoppdoringer...
+	AUTOUPDATECHECKER_UPDATING=		Auto-oppdor
+	AUTOUPDATECHECKER_DOWNLOADING=	Innlaster
+	AUTOUPDATECHECKER_VERIFYING=	Overprover
+	AUTOUPDATECHECKER_INSTALLING=	Innlejer
+	AUTOUPDATECHECKER_FAILED=		Nøn oppdoringer feilet. Overprover dytt log.txt fer mer info.
+	AUTOUPDATECHECKER_CONTINUE=		Þrykker Bœkrefter fer fremsetter
+	AUTOUPDATECHECKER_REBOOT=		Þrykker Bœkrefter fer enabegynner Celeste
+	AUTOUPDATECHECKER_SKIP=			Hopper over
+	AUTOUPDATECHECKER_SKIPPING=		Hopper over oppdoring...
+
+# Dependency downloader
+	DEPENDENCYDOWNLOADER_TITLE=						INNLEJER FRAHENGTER
+	DEPENDENCYDOWNLOADER_DOWNLOADING_DATABASE=		Innlaster modd datalagne...
+	DEPENDENCYDOWNLOADER_LOADING_INSTALLED_MODS=	Laster info sud innlejet modder...
+	DEPENDENCYDOWNLOADER_DONE=						fuldyd.
+	DEPENDENCYDOWNLOADER_DOWNLOAD_DATABASE_FAILED=	FEIL: Feilet innlaster datalagna. Œgi overprover dytt log.txt fer mer info.
+	DEPENDENCYDOWNLOADER_MUST_UPDATE_EVEREST=		VAREL: Þrynger oppdyd Everest urgave fer nøn modder laster. Innlejer det fra eta Œnner Everest Urgave meny.
+	DEPENDENCYDOWNLOADER_EVEREST_UPDATE=			Skal oppdor Everest tro {0} fer dor nøn modder tro fungerer. Þrykker Bœkrefter fer fremsetter.
+	DEPENDENCYDOWNLOADER_MOD_NOT_FOUND=				FEIL: Ka ike finner {0} uttro datalagna. Œgi innlejer denne moddet vœd hånd.
+	DEPENDENCYDOWNLOADER_UPDATE_CELESTE=			FEIL: Nøn av dytt moddene þrynger natidigmer urgave til Celeste fer fungerer. Œgi oppdor dytt spillet.
+	DEPENDENCYDOWNLOADER_MOD_NOT_AUTO_INSTALLABLE=	FEIL: {0} yr vœlgebar tæn mer enn en urgaver eh ka ike innlejer det autolig. Œgi innlejer denne moddet vœd hånd.
+	DEPENDENCYDOWNLOADER_MOD_WRONG_VERSION=			FEIL: Þrynger urgave(r) {1} av {0}, ned nur urgava {2} yr vœlgebar. Œgi innlejer denne moddet vœd hånd.
+	DEPENDENCYDOWNLOADER_RESTARTING=				Enabegynner
+	DEPENDENCYDOWNLOADER_RESTARTING_IN=				Enabegynner na {0}
+	DEPENDENCYDOWNLOADER_PRESS_BACK_TO_RESTART=		Þrykker Bak fer enabegynner Celeste
+	DEPENDENCYDOWNLOADER_PRESS_BACK_TO_GO_BACK=		Þrykker Bak fer kommer Moddvœlginger.
+	DEPENDENCYDOWNLOADER_DOWNLOADING=				Innlaster {0} fra {1}...
+	DEPENDENCYDOWNLOADER_DOWNLOADING_MIRROR=		Feiler innlaster, prover spegelet {0}...
+	DEPENDENCYDOWNLOADER_DOWNLOAD_FINISHED=			Fuldyd innlaster.
+	DEPENDENCYDOWNLOADER_VERIFYING_CHECKSUM=		Overprover provinnallt...
+	DEPENDENCYDOWNLOADER_UPDATING=					Innlejer oppdoring til {0} ({1} -> {2}) tro {3}...
+	DEPENDENCYDOWNLOADER_INSTALLING=				Innlejer modd {0} ug.{1} tro {2}...
+	DEPENDENCYDOWNLOADER_INSTALL_FAILED=			FEIL: Feilet innlejer {0}. Œgi overprover dytt log.txt fer mer info.
+	DEPENDENCYDOWNLOADER_HOTLOAD_FAILED=			VARSEL: Feilet varmlaster {0}. Skal þrynger enabegynner.
+	DEPENDENCYDOWNLOADER_MOD_UNBLACKLIST=			Fjerner modd {0} fra svartlistet...
+	DEPENDENCYDOWNLOADER_UNBLACKLIST_FAILED=		Feilet autolig frasvartlister nøn modder. Overprover log.txt fer mer info.
+	DEPENDENCYDOWNLOADER_LOADING_MOD=				Laster {0} fra {1}...
+	DEPENDENCYDOWNLOADER_LOADING_MOD_NOMETA=		Laster modd fra {0}...
+
+# OOBE (Out Of Box Experience) - first launch stuff
+	OOBE_WELCOME_HEADER=		Godkommen tro Everest!
+	OOBE_WELCOME_SUBHEADER=		Sågœ dor du?
+	OOBE_WELCOME_PLAY=			Jo sågœ LEKER modder.
+	OOBE_WELCOME_SPEEDRUN=		Jo sågœ TIDLØPER modder.
+	OOBE_WELCOME_CREATE=		Jo sågœ SKAPER modder.
+	OOBE_WELCOME_SKIP=			Jo þrynger ike enøn hjelp.
+
+	OOBE_SETTINGS_PLAY=			Du ka finner e innlejer modder utopp GameBanana.{n}Ka finner innlejet mapper utopp jørþmappet.{n}Deler dytt fremgåinget virig tæn dytt Discord Riknalangnehet.{n}Brykker F6 na uttro frabuggeham fer œnner eta ny mappfrabuggeskjerm.
+	OOBE_SETTINGS_SPEEDRUN=		Halder høyre utopp titœllskjerm fer enabegynner tro vanil.{n}Du ka finner e innlejer modder utopp GameBanana.{n}Ka finner Innlejet mapper utopp jørþmappet.{n}Brykker F6 na uttro frabuggeham fer œnner eta ny mappfrabuggeskjerm.
+	OOBE_SETTINGS_CREATE=		Du ka finner eh deler modder utopp GameBanana.{n}Ka finner tropassig mapper utopp jørþmappet.{n}Brykker F6 na frabuggeham fer œnner eta ny mappfrabuggeskjerm.{n}Þrykker F5 fer enalaster eta natidig mappet, ur KTRL+F5 fer enalaster spillet.{n}Vi du har i-QWERTY þrykkebord, . åpner konsollet, q unnåpner det.
+	OOBE_SETTINGS_SUBHEADER=	Denne uter nøn vœlginger mœd œgi uthovner du.
+	OOBE_SETTINGS_MORE=			Du ka œnner denne e mer utopp Moddvœlgingerskjerm.
+	OOBE_SETTINGS_OK=			BRA
+
+# Mod Toggle Menu
+	MODOPTIONS_MODTOGGLE=							ŒNNER MODDER
+	MODOPTIONS_MODTOGGLE_LOADING=					Laster modd info...
+	MODOPTIONS_MODTOGGLE_TOGGLEDEPS=				Œnner Frahengter Autolig
+	MODOPTIONS_MODTOGGLE_TOGGLEDEPS_MESSAGE1=		Na du tar tro modd, autolig tar tro alle frahengter til det eså.
+	MODOPTIONS_MODTOGGLE_TOGGLEDEPS_MESSAGE2=		Na du tar fra modd, autolig tar fra alle modder mœd frahenger det eså.
+	MODOPTIONS_MODTOGGLE_PROTECTFAVORITES=			Vakker Favoritter
+	MODOPTIONS_MODTOGGLE_PROTECTFAVORITES_MESSAGE=	Þrykker {0} fer lejer tro ur fjerner modder fra dytt favorittlistet.
+	MODOPTIONS_MODTOGGLE_MESSAGE_1=					Vi du tar tro ur fra modder, skal enalejer dytt blacklist.txt,
+	MODOPTIONS_MODTOGGLE_MESSAGE_2=					eh Celeste skal enabegynner fer søkrer œnninger tro.
+	MODOPTIONS_MODTOGGLE_MESSAGE_3=					Brykker høylyset modder blivig modder mœd tatt tro tæn frahengter.
+	MODOPTIONS_MODTOGGLE_WHITELISTWARN= 			Tar fra dytt hvitlist fer søkrer denne vœlgingene tro riktlig.
+	MODOPTIONS_MODTOGGLE_ENABLEALL=					Tar Tro Alle
+	MODOPTIONS_MODTOGGLE_DISABLEALL=				Tar FRA Alle
+	MODOPTIONS_MODTOGGLE_CANCEL=					Frakutter
+	MODOPTIONS_MODTOGGLE_ZIPS=						Zip Filer
+	MODOPTIONS_MODTOGGLE_DIRECTORIES=				Skrar
+	MODOPTIONS_MODTOGGLE_BINS=						Mapp Bin Filer
+	MODOPTIONS_MODTOGGLE_SEARCHBOX_PLACEHOLDER=		Þrykker 'Tab' ur 'Vœlger' fer går nehst samsvar
+
+# Asset Reload Helper
+	ASSETRELOADHELPER_RELOADINGMAP=			Enalaster mapp
+	ASSETRELOADHELPER_RELOADINGLEVEL=		Enalaster nivå
+	ASSETRELOADHELPER_UNLOADINGTEXTURE=		Unnlaster tekstur:
+	ASSETRELOADHELPER_RELOADINGMAPNAME=		Enalaster mapp:
+	ASSETRELOADHELPER_RELOADINGALLMAPS=		Enalaster alle mapper
+	ASSETRELOADHELPER_RELOADINGDIALOG=		Enalaster samsjårer:
+	ASSETRELOADHELPER_RELOADINGTEXTURE=		Enalaster tekstur:
+	ASSETRELOADHELPER_RELOADINGTEXTURES=	Enalaster teksturer:
+	ASSETRELOADHELPER_LOADINGNEWMOD=		Laster ny modd:
+	ASSETRELOADHELPER_RELOADINGMODASSEMBLY=	Enalaster moddbyggne:
+	ASSETRELOADHELPER_RELOADINGMOUNTAIN=	Enalaster fjellet
