@@ -519,8 +519,8 @@ return {
             j_blackboard={
                 name="Svartvægg",
                 text={
-                    "{X:red,C:white} X#1# {} Mult vi alle",
-                    "korter mœd halder uttro håndet",
+                    "{X:red,C:white} X#1# {} Mult vi alle korter",
+                    "mœd halder uttro håndet",
                     "yr {C:spades}#2#{} ur {C:clubs}#3#{}",
                 },
             },
@@ -1895,7 +1895,7 @@ return {
             },
             card_extra_chips={
                 text={
-                    "{C:chips}+#1#{} sparet Brœkker",
+                    "{C:chips}#1#{} sparet Brœkker",
                 },
             },
             challenge_locked={
