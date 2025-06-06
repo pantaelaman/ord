@@ -70,6 +70,13 @@ fn handle_command<'a, B: Backend>(
         }
       };
 
+      if phones.is_empty() {
+        break 'phone Text::styled(
+          format!("could not find any matching phones"),
+          Color::Red,
+        );
+      }
+
       phones.sort_by_key(|(phone, _)| *phone);
 
       return Ok(State::new(ChoiceWidget::new(
