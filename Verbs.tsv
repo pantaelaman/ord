@@ -5,7 +5,7 @@ alda	alda	wave
 ansihtsjå	ansiht,SO	express (facially)	ansihtsjår	ansihtsjått	
 åpne	OpnY	open			
 arbejþe	arbeTY	work			
-aþdå	aTdO	adjust	aþdor	aþdyd	
+aþdå	aT,dO	adjust, modify	aþdor	aþdyd	
 aþgrejne	aTgrenY	distinguish			
 aþme	aTmY	breathe			
 bå	bO	live (in)	bår	bått	
@@ -69,7 +69,7 @@ følje	fUljY	follow			føljering
 forfyle	for,fylY	excite	forfyler	forfylt	
 forhjuppe	for,HjupY	shove			
 forlate	for,latY	abandon, desert			
-forsja	for,Sa	stare			forsjaring
+forsja	for,Sa	stare; search (w/ fer); explore (w/ gœn)			forsjaring
 forsulte	for,sultY	starve			
 forsva	for,sva	defend			
 forvirre	for,virY	confuse			
@@ -288,3 +288,134 @@ yse	ysY	hustle
 þumpe	TumpY	thump			
 þunke	TunkY	thunk			
 þyrke	TyrkY	wipe			
+fomle	fomlY	fumble			
+dœskaþe	dE,skaTY	harm, hurt			
+vœsjalive	vE,Sa,livY	live vicariously			
+fradœkke	fra,dEkY	uncover, expose, reveal			
+aþdragge	aT,dragY	zoom			
+hake	hakY	cling			
+samhake	sam,hakY	huddle (together)			
+enbejte	enbItY	focus			
+posjå,klosjå	po,SO	gesture			
+båleje	bO,lejY	settle (populate a location)			
+innleje	in,lejY	deposit, submit			
+våkse	vOksY	grow, increase			
+møte	mUtY	meet			
+resje	reSY	reach, arrive at; escape, get out (w/ fra)			
+hlyþe	HlyþY	prosper			
+styre	styrY	govern, rule, command			
+fradœgå	fra,dE,gO	divert			
+unnvåkse	un,vOksY	decrease, decline			
+rundgå	rund,gO	bypass			
+dœsigre	dE,sigrY	defeat, overcome			
+bjoþe	bjoTY	challenge			
+fremsja	frEm,Sa	foresee, predict			
+dœbœganne	dE,bE,ganY	randomise			
+dokke	dokY	duck, dip; w/ opp: appear			
+blåte	blOtY	hex, curse, jinx			
+klove	klovY	copy, duplicate			
+forbrykke	for,brykY	consume, use entirely			
+male	malY	paint			
+multiplise	multiplisY	multiply			
+spare	sparY	spare			
+dœsterke	dE,sterk	buff, strengthen			
+unndœsterke	un,dE,sterk	debuff			
+vetsje	veTSY	goad, provoke			
+skape	skapY	create			
+stigge	stigY	score			
+vandre	vandrY	wander			
+færsja	fArSY	research			
+skylle	SylY	pour, rinse, flush			
+enaleje	ena,lejY	reset			
+ejge	egY	owe			
+dœsejne	dE,senY	delay			
+fratenke	fra,tenkY	devise			
+manhald	man,hald	diet			
+kola	kola	cola			
+drikke	drikY	drink			
+fordrikke	for,drikY	get drunk			
+erode	erodY	erode			
+innha	in,ha	contain			
+enaþrykke	ena,TrykY	retrigger			
+enaskjote	ena,SotY	reroll			
+jongle	joNglY	juggle			
+poste	postY	post			
+bœtale	bE,talY	pay			
+þrusje	TruSY	print			
+dœdoble	dE,doblY	double			
+gnise	gnisY	shine			
+løpe	lUp	run			
+skrœmme	skrEmY	scare			
+smøre	smUrY	smear, distort			
+gnyje	nyjY	splash			
+riþje	riTjY	empty, drain, clear			
+eje	ejY	own			
+rænvakke	rAn,vakY	save			
+viþje	viTjY	trade			
+klistre	klistrY	stick			
+samle	samlY	gather, collect			
+forfare	for,farY	perish			
+legje	legjY	rent			
+så	sO	seed, sow			
+brœnne	brEnY	immolate, blaze			
+søkre	sUkrY	seek; apply (w/ tro)			
+innbœtale	in,bE,talY	invest			
+dømme	dUmY	judge			
+kutte	kutY	cut			
+hjerfe	SerfY	sharpen			
+blekkje	blekjY	lie			
+enabrykke	ena,brykY	recycle, reuse			
+dœgrense	dE,grensY	limit			
+bøje	bUjY	bend, bow			
+ståje	stOjY	tax			
+kreditte	kreditY	credit			
+tropasse	tro,pasY	adapt, customise			
+slœtt	slEt	delete			
+fjern	fjern	remove			
+laste	laste	load			
+stille	stilY	control			
+erresje	ereSY	achive			
+banne	banY	ban			
+fordø	for,dU	go extinct			
+redde	redY	save			
+þroe	TroY	develop			
+bœkrefte	bE,kreftY	confirm			
+frahenge	fra,heNY	depend (on)			
+bœløse	bE,lUsY	solve			
+vye	vyY	conflict			
+forgamme	for,gamY	outdate			
+støtte	stUtY	support			
+klatre	klatrY	climb			
+strikke	strikY	dash			
+sidœnne	sid,EnY	invert (lit. side change)			
+frakutte	fra,kutY	cancel			
+dœhlikte	dE,SliktY	corrupt (lit. make bad)			
+forhalde	for,haldY	endure, withstand			
+speglesja	speglY,Sa	reflect (lit. mirror see)			
+fryse	frysY	freeze			
+fraløpe	fra,lUpY	outrun			
+bœvite	bE,vitY	believe			
+heje	heje	hail			
+sløse	slUsY	waste			
+njyte	nytY	enjoy			
+blaste	blastY	blow			
+innblaste	in,blastY	inspire			
+jagge	jagY	chase, hunt			
+selvskrœmme	selv,skrEmY	panic			
+sive	sivY	filter			
+love	lovY	promise			
+þjonuste	TjonustY	serve			
+anbrye	an,bryY	attack			
+uthovne	ut,hov,nY	interest			
+dœtrœste	dE,trEstY	ensure			
+grejne	grenY	parse, analyse			
+dele	dele	share			
+fraløfte	fra,lUftY	launch, lift off			
+fremspyre	frEm,spyrY	prompt			
+sigla	sila	navigate			
+blitte	blitY	flash			
+frafalle	fra,falY	result in			
+enafriske	ena,friskY	refresh			
+innsamme	in,samY	join			
+innlåde	in,lOde	invite			
+lage	lagY	store			

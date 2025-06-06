@@ -3,18 +3,18 @@ Word	Phon. Root	Definition	Variant Plural	Variant Definite	Variant Definite Plur
 afsiht	afsiht	intention			
 alvar	alvar	seriousness			
 anker	anker	anchor			
-ansihsjått	ansih,SOt	expression (facial)			
+ansihsjått	ansih,SO,t	expression (facial)			
 ansiht	ansiht	face			
 år	Or	year			
-arbejþing	arbETY	work			
+arbejþing	arbETY,iN	work			
 arm	arm	arm			
 autobus	autobus	bus			
-aþme	aTm	breath			
+aþme	aTmY	breath			
 bak	bak	back			
 bakdag	bak,da	afternoon (lit. back of day)			
 bakdag	bak,da	yesterday			
-bakdåne	bak,dO	reaction			
-bakhengne	bak,heN	backbend			
+bakdåne	bak,dO,nY	reaction			
+bakhengne	bak,heN,nY	backbend			
 bakskøl	bak,skUl	grad school			
 ball	bal	ball			
 band	band	band			
@@ -24,29 +24,29 @@ basseng	baseN	pool
 batteri	batEri	battery			
 bil	bil	car			
 bjørn	bjUrn	bear			
-blihalding	bli,hald	recreation			
+blihalding	bli,hald,iN	recreation			
 blit	blit	flash, lightning			
-blivne	bliv	rest, remaining			
+blivne	bliv,n	rest, remaining			
 blød	blUd	blood			
-bœstudenær	bEstud	customer			
+bœstudenær	bEstud,enAr	customer			
 bord	bord	table			
-bragþing	bragT	glow			
+bragþing	bragT,iN	glow			
 brauþ	brWT	bread			
-brødiþ	brUd	bun			
+brødiþ	brUd,iT	bun			
 brœdd	brEd	bank (of a river)			
 bryn	bryn	brow			
 burger	burger	burger	burgerer	burgeret	burgerene
-bytendter	bytendY	lighter, ignition			
+bytendenær	bytendY,enAr	lighter, ignition			
 dag	da	day		dagt	
 del	del	part			
 diner,dajner	dwner	diner (loanword)			
-dœklum	dEklum	document			
+dœklum	dEk,lum	document			
 dœr	dEr	door			
 dokk	dok	dock			
 drauger	drWger	ghost			
 draugrejørne	drWger,jUrnY	ghost town			
 drek	drek	mud			
-drekvaktenær	drek,vak	dashboard (from mud guard)			
+drekvakenær	drek,vak,enAr	dashboard (from mud guard)			
 dritt	drit	shit			
 dverg	dverg	dwarf			
 dyr	dyr	animal	dyr		
@@ -55,7 +55,7 @@ egytt	egyt	success
 ejm	Im	smell, whiff, odor			
 elder	Elder	parent			
 emne,œmne	EmnY	topic			
-enavœrn	ena,vErn	reunion			
+enavœrn	ena,vErnY,n	reunion			
 erfiþer	erfiTer	problem, difficulty			
 eþjing	eTjiN	lack(ing), shortcoming			
 fakt	fakt	fact			
@@ -76,14 +76,14 @@ fœst	fEst	party
 foht	foHt	trip, journey			
 folie	foliY	foil			
 fon	fon	shortening of telefon			
-forfylesjon	for,fylY	excitement			
+forfylesjon	for,fylY,Son	excitement			
 forlatt	for,lat	desert			
-forsvaring	for,sva	defence			
-forvirresjon	for,virY	confusion			
+forsvaring	for,sva,iN	defence			
+forvirresjon	for,virY,Son	confusion			
 føt	fUt	foot			
 føtlœdd	fUt,lEd	ankle			
-frasjatt	fra,Sa	view, perspective			
-fraskyldne	fra,SyldY	excuse			
+frasjatt	fra,Sa,t	view, perspective			
+fraskyldne	fra,SyldY,nY	excuse			
 frastor	fra,stor	distance			
 fravei	fra,vI	exit			
 frem	frEm	front; chest (body part)			
@@ -101,13 +101,13 @@ gejpe	geTY	lynx
 gevort	gevort	direction			
 gibejn	gibIn	leg			
 glas	glas	glass			
-grinn	grinY	grin			
-gripp	gripY	grip, hold			
-grønner	grUn	lettuce			
+grinn	grin	grin			
+gripp	grip	grip, hold			
+grønner	grUn,er	lettuce			
 grønnman	grUn,man	vegetable			
 gruppe	grupY	group			
 gud	gud	god			
-hald	haldY	hold			
+hald	hald	hold			
 hale	halY	tail			
 haliþe	haliTY	hero			
 hallœn	halEn	hall			
@@ -115,11 +115,11 @@ halvår	halv,Or	semester
 hånd	hOnd	hand			
 håndlœdd	hOnd,lEd	wrist			
 hejne	henY	aid			
-hejþenær	heT	imposter			
-heting	hetY	name			
+hejþenær	heTY,enAr	imposter			
+heting	hetY,iN	name			
 himling	himliN	ceiling			
 historie	historiY	history			
-hjekt	Sje	session, meeting			
+hjekt	Sje,t	session, meeting			
 hjem	jEm	home			
 hjert	jert	heart			
 hjilt	Silt	sign			
@@ -127,7 +127,7 @@ hjorn	Hjorn	horn; corner
 hjuf	Suf	drawer	hjuffer	hjuffet	hjuffene
 hlœtel	SlEtYl	key			
 høl	hUl	hole			
-høsjon	hU	height			
+høsjon	hU,Son	height			
 høst	hUst	autumn			
 hovt	hovt	head (body part); source, origin			
 hovtvei	hovt,vw	main street			
@@ -154,30 +154,30 @@ kant	kant	edge
 kejst	kest	mind			
 kjemistri	SEmistri	chemistry		kjemistret	
 kjøtt	SUt	meat			
-klæresjon	klAre	declaration			
-klem	klemY	hug			
+klæresjon	klAre,Son	declaration			
+klem	klem	hug			
 klo	klo	(hand)claw (not necessarily sharp)			
 klokke	klokY	clock			
 klolœdd	klo,lEd	wrist (attached to a handclaw)			
 klose	klosY	(feet)claw (not necessarily sharp)			
 kloselœdd	klosY,lEd	footclaw ankle			
 klud	klud	cloth			
-kludiþ	klud	napkin			
-klunkenær	klunke	clunker			
+kludiþ	klud,iT	napkin			
+klunkenær	klunkY,enAr	clunker			
 knokel	knokel	knuckle	knokler	knoklet	knoklene
 komik	komik	comic			
-kønig	kUni	king			
+kønig	kUni	king/queen			
 kort	kort	card			
 køstre	kUstrY	pile			
 kropp	krop	body			
 ku	ku	cow			
 kubb	kub	cube			
 kukjøtt	ku,SUt	beef			
-kunnær	kunne	student			
-kunngavenær	kunne,gave	counsellor			
-kunnsveit	kunne,svet	class			
+kunnær	kun,enAr	student			
+kunngavenær	kun,gavY,enAr	counsellor			
+kunnsveit	kun,svet	class			
 kurv	kurv	curve			
-kveljegripp	kvelje,gripe	chokehold			
+kveljegripp	kvelje,grip	chokehold			
 kylling	SyliN	chicken (living animal)			
 kyllingkjøtt	SyliN,SUt	chicken (meat)			
 læpp	lAp	lap			
@@ -185,22 +185,22 @@ lag	la	layer
 lajnde	lwndY	mystery			
 laþne	laTnY	chuckle, laugh			
 lekjene	lekjEnY	sports			
-lekne	lekY	toy			
+lekne	lekY,nY	toy			
 leppe	lepY	lip			
-lœsk	lEsk	lesson			
-lettne	lete	relief			
+lettne	lete,nY	relief			
 leþur	leTur	leather			
 linje	linjY	line			
 litjørne	lit,jUrnY	town			
-litsjane	lit,Sa	glimpse			
+litsjane	lit,Sa,nY	glimpse			
 litsjœr	lit,Ser	lake			
 littahsje	lit,taHSY	pocket (lit. little bag)			
 liv	liv	life			
 lød	lUd	sound			
 lœdd	lEd	link, joint			
-loen	lEn	reservoir			
+loen	loEn	reservoir			
+lœsk	lEsk	lesson			
 loft	loft	air			
-lohd	loHd	lord			
+lohd	loHd	lord/lady			
 lotne	lote	awe, admiration			
 luhn	luHn	mood			
 mago	mago	stomach			
@@ -208,13 +208,13 @@ mam	mam	mom
 mami	mami	mommy (typically sexual, derogatory)			
 man	man	food			
 mån	mOn	moon			
-medapassenær	meda,pase	passenger			
+medapassenær	meda,pasY,enAr	passenger			
 melk	mElk	milk			
 mensa	mensA	woman			
 menså	mensO	man			
-mensjap	mens,Sap	community			
+mensjap	mensk,Sap	community			
 mensk	mensk	person	mensk		
-menskiþ	mens	character			
+menskiþ	mensk,iT	character			
 mersing	mersiN	brass			
 mest	mest	most			
 middag	mid,da	midday			
@@ -225,78 +225,79 @@ miþel	miTYl	middle
 mor	mor	mother			
 motel	motEl	motel (loanword)			
 muld	muld	mold			
-muligsjon	mulY	sulkiness			
-muning	munY	difference			
+muligsjon	mulY,Son	sulkiness			
+muning	munY,iN	difference			
 musikk	musik	music			
 muþe	muTY	mouth			
-muþful	muTY	bite, mouthful			
+muþful	muTY,ful	bite, mouthful			
 mygg	myg	mosquito			
 naht	naHt	night			
-nalangnet	na,langnY	present			
+nalangnet	na,langnYt	present			
 nase	nase	nose			
 nasehøl	nase,hUl	nostril			
 natur	natur	nature			
 nerd	nerd	nerd			
 nummer	numer	number (quantity)			
-nysjon	ny	new(s) (often always pluralised)			
+nysjon	ny,Son	new(s) (often always pluralised)			
 œkot	Eko	echo			
 œlbu	Elbu	elbow			
 œlv	Elv	river			
-œniging	EnijY	agreement			
+œniging	EnijY,iN	agreement			
 œþle	ETlY	trait			
 olje	oljY	oil			
-oppletne	op,letY	cheer			
+oppletne	op,letY,nY	cheer			
 opprinne	oprinY	original			
-opptan	op,ta	shot (of film)			
-orasjått	ora,SO	sentence			
+opptan	op,ta,n	shot (of film)			
+orasjått	ora,SO,t	sentence			
 øre	UrY	ear			
 oter	oter	otter	oterer	oteret	oterene
 overrahne	over,raHnY	surprise			
 øye	UjY	eye			
 øyebryn	UjY,bryn	eyebrow			
 øyekar	UjY,ka	vision, sight			
-øyevilne	UjY,vilY	moment (blink of an eye; lit. eye rest)			
-pakne	pakY	package			
+øyevilne	UjY,vilY,nY	moment (blink of an eye; lit. eye rest)			
+pakne	pakY,nY	package, pack			
 pap	pap	dad			
 papir	papir	paper			
 paprika	paprika	bell pepper			
 par	par	pair			
-parkerutning	parkY,utnY	parking lot			
+parkerutning	parkY,utY,n,iN	parking lot			
 pjul	pjul	pillow	pjuller	pjullet	pjullene
 plann	plan	plan			
 po	po	(hand)paw, hand (affectionate)			
 polœdd	po,lEd	wrist (attached to a handpaw)			
+por	por	pore			
 pose	pose	(feet)paw, toe (affectionate)			
 poselœdd	pose,lEd	footpaw ankle			
-premstenær	premstY	brake	premstre	premstret	premstrene
-prudlak	pru,lak	school			
-prudœk	pru,dEk	a practise/exercise (not physical)			
+premstenær	premstY,enAr	brake	premstre	premstret	premstrene
+prudlak	prud,lak	school			
+prudœk	prud,dEk	a practise/exercise (not physical)			
 puppe	pupY	boob (informal)			
 radio	radio	radio			
 rænliv	rAn,liv	abdomen			
 ramp	ramp	ramp			
 rejr	rer	reed			
 rektangel	rEktaNgYl	rectangle			
-reservte	reservY	reservation			
-rœht,rœhtne	rEHtY	crack, fissure			
+reservte	reservY,tY	reservation			
+rœht,rœhtne	rEHt	crack, fissure			
 roll	rol	roll			
 rom	rom	room			
 roþt	roTt	project			
 rust	rust	rust			
 sage	sagY	story			
-samfylesjon	sam,fylY	sympathy			
-samjåre	sam,SO	conversation			
+samfylesjon	sam,fylY,Son	sympathy			
+samjåre	sam,SO,rY	conversation			
 sandwich,sandvih	sandviH	sandwich (loanword)			
-sang	saNdviH	song			
-sangsjått	saN,SO	lyric			
+sang	saN	song			
+sangsjått	saN,SO,t	lyric			
 sauna	sWna	sauna			
 selv	sElv	self			
-selvsjeming	sElv,SemY	embarassment			
+selvsjeming	sElv,SemY,iN	embarassment			
 sid	sid	side			
-sjemne	SemY	shame			
+sjemne	SemY,nY	shame			
 sjief	Sif	disc		sjieft	
 sjœr	Ser	seat			
-sjupte	SupY	jab, hit			
+sjupte	SupY,tY	jab, hit			
 sjyff	Syf	shag			
 skaft	skaft	shaft, shank			
 skale	skalY	scale			
@@ -307,100 +308,385 @@ skølder	skUlder	shoulder
 skruþ	skruT	material, stuff			
 skyld	SyldY	blame			
 slang	slang	snake			
-slitne	slitY	a pause, a break			
-slutting	slutY	end(ing)			
-smil	smilY	smile			
+slitne	slitY,nY	a pause, a break			
+slutting	slutY,iN	end(ing)			
+smil	smil	smile			
 snø	snU	snow			
 snøstorm	snU,storm	snowstorm, blizzard			
-snune	snu	flip			
+snune	snu,nY	flip			
 snut	snut	snout, nose			
 sœng	sEN	bed			
-sœt	sEtY	seat			
+sœt	sEt	seat			
 sofa	sofa	sofa, couch			
-søgte	sUgtY	report			
+søgte	sUgnY,tY	report			
 sol	sol	sun			
 sølv	sUlv	silver			
 spegel	spegYl	mirror			
 spek	spek	lever			
-spekasje	spek	leverage			
+spekasje	spek,aSY	leverage			
 spenn	spen	tension			
 spesjis	speSis	species			
-spesjist	speSis	specist/speciesist			
+spesjist	speSis,ist	specist/speciesist			
 språk	sprOk	language; tongue			
-stabilsjon	stabil	sturdiness			
+stabilsjon	stabil,Son	sturdiness			
 standard	standard	standard			
-starfing	starfY	business			
-ståring	stO	posture			
+starfing	starfY,iN	business			
+ståring	stO,iN	posture			
 stasjon	staSon	station			
 stejn	sten	stone			
-stepp	stepY	step			
+stepp	step	step			
 stihr	stiHr	trail, path			
 stimm	stim	voice			
 stinkdyr	stink,dyr	skunk			
 stof	stof	dust			
-stokk	stok	stock, log, stick			
-stopp	stopY	stop			
+stokk	stok	stock, log, stick; deck (of cards)			
+stopp	stop	stop			
 storm	storm	storm			
-storsjon	stor	size, length, dimension			
+storsjon	stor,Son	size, length, dimension			
 strand	strand	beach			
-stressner	stresY	stresser			
+stressenær	stresY,enAr	stresser			
 strœt	strEt	street			
 studlak	stud,lak	store			
 stun	stun	hour	stunner	stunnet	stunnene
 stund	stund	while, indeterminate long time			
-sulting	sultY	hunger			
+sulting	sultY,iN	hunger			
 superhaliþe	super,haliTY	superhero			
-sutlebaring	sultY	appetite			
+sultebaring	sultY,bar,iN	appetite			
 svar	sva	response, answer			
-svarsjått	sva,SO	comment			
+svarsjått	sva,SO,t	comment			
 sveit	svet	group			
-tænet	tAn	same (exclusively used in the definite)			
+tænet	tAn	same (exclusively used in the definite)	tænene	tænet	tænene
 tahsje	taHSY	bag			
 tale	talY	number			
 talesjief	talY,Sif	dial		talesjieft	
 tan	tan	turn, round			
 teater	teater	theater			
-teatrikk	teater	theatric (almost exclusively used as a plural)			
+teatrikk	teater,ik	theatric (almost exclusively used as a plural)			
 tekst	tekst	text			
 telefon	telefon	phone			
 tid	tid	time (like Spanish tiempo)			
 timer	timer	timer			
 tip	tip	type			
-tœknisomiþ	tEkni	technicality			
+tœknisomiþ	tEkni,som,iT	technicality			
 topp	top	top			
 transe	transY	trance			
-treføtenær	tre,fUt	tripod (lit. three-footer)			
+treføtenær	tre,fUt,enAr	tripod (lit. three-footer)			
 trœst	trEst	confidence, trust			
-trojutning,trytning	tro,utY	destination			
-troliggjing	tro,liggjY	introduction			
-trolœt,opplœt	tro,lEtY	equipment (originally trolejte)			
+trojutning,trytning	tro,utY,nY,iN	destination			
+troliggjing	tro,liggjY,iN	introduction			
+trolœt,opplœt	tro,lEt	equipment (originally trolejte)			
 tyft	tyft	tuft			
 typ	typ	type			
-ugrinn	u,grinY	smirk			
+ugrinn	u,grin	smirk			
 uke	ukY	week			
-unfremdel	un,frem,del	disadvantage			
-utning	utY	location			
+unfremdel	un,frEm,del	disadvantage			
+utning	utY,nY,iN	location			
 vædd	vAd	ram (sheep)			
-vakkenær	vakY	guard			
+vakkenær	vakY,enAr	guard			
 vald	vald	violence			
 vann	van	water			
 var	var	spring (season)			
-varmesjupte	varm,SupY	heatstroke			
+varmesjupte	varm,SupY,tY	heatstroke			
+varmsomsjief	varm,som,Sif	thermostat			
 vei	vI	way, road, path			
 veihøl	vI,hUl	pothole (lit. road hole)			
 venn	ven	friend			
 vesel	vesel	weasel			
-viftenær	viftY	fan			
+viftenær	viftY,enAr	fan			
 vilerom	vilY,rom	restroom			
 vilfoht	vilY,foHt	vacation (lit. rest trip)			
 vilfohtthjem	vilY,foHt,jEm	vacation home			
-vilne	vilY	rest			
+vilne	vilY,nY	rest			
 vindu	vindu	window			
 viris	viris	dignity			
-vits	vitsY	joke			
+vits	vits	joke			
 vœrn	vern	union			
 vokse	voksY	adult			
-vorsjått	vor,SO	word			
+vorsjått	vor,SO,t	word			
 vort	vort	reason, logic			
 þummel	TumYl	thumb	þummler	þummlet	þummlene
-varmsomsjief	varm,Sif	thermostat			
+skaþ	skaT	harm			
+stahhet	staH,hEt	balance			
+fradœkkighet	fra,dEk,i,hEt	exposure			
+hvitstahhet	vit,staH,hEt	white balance			
+liggjenær	ligj,enAr	manager, director			
+ramm	ram	frame			
+sjafinnenær	Sa,fin,enAr	viewfinder			
+mikrofon	mikrofon	microphone			
+bålejutning	bO,lej,ut,n,iN	settlement			
+gull	gul	gold			
+kvarts	kvarts	quartz			
+innlejing	in,lej,iN	deposit, deposition			
+veimøtne	vI,mUt,nY	intersection, junction (of roads or tracks)			
+bane	banY	track, (transit) line			
+jernbane	jern,banY	train track, railway			
+båmensksjon	bO,mensk,Son	population			
+hjering	Ser,iN	phenomenon, occurence			
+bølk	bUlk	mass			
+hysteri	hysteri	hysteria			
+finning	fin,iN	discovery			
+gruve	gruvY	mine			
+styring	styr,iN	government			
+lohv	loHv	law			
+krihg	kriHg	war			
+merk	merk	goal			
+kunniþ	kun,iT	information			
+fremtid	frEm,tid	past			
+baktid	bak,tid	future			
+søgnenær	sUgn,enAr	reporter			
+tungsjon	tuN,Son	weight			
+klor	klor	clothes, clothing			
+glyf	glyf	glyph			
+anaglyf	ana,glyf	anaglyph			
+sjef	Sef	boss, chief (informal)			
+spor	spor	slot			
+bjodde	bjoT,tY	challenge			
+sjakk	Sak	chess			
+røþ	rUT	rank			
+nivå	nivO	level			
+draht	draHt	costume, suit (of cards)			
+rente	rentY	interest (money)			
+magg	mag	magic			
+kupång	kupON	coupon, voucher			
+klovne	klov,nY	copy, instance			
+brœkk	brEk	chip, pawn, piece			
+stiggre	stigrY	score			
+grunn	grun	base, foundation			
+kolb	kolb	club (weapon)			
+nøtt	nUt	nut			
+eik	Ik	oak			
+eiknøtt	Ik,nUt	acorn (lit. oak nut)			
+bjœll	bjEl	bell			
+lejf	lef	leaf			
+ker	ker	vessel, cup			
+spaþ	spaT	spade			
+krok	krok	hook			
+flint	flint	flint			
+nål	nOl	needle			
+oks	oks	ox			
+peng	peN	money			
+søyle	sUylY	pillar			
+plant	plant	plant			
+psykenær	syk,enAr	psychic			
+tann	tan	tooth			
+vægg	vAg	wall			
+radd	rad	wheel			
+diamant	diamant	diamond			
+ahrif	aHrif	effect			
+færg	fArg	colour			
+bonus	bonus	bonus			
+muligsjon	mul,i,Son	chance			
+hœpp	hEp	luck			
+sterje	sterjY	star			
+jørþsterje	jUrT,sterjY	planet (lit. earth star)			
+færsjarenær	fAr,Sar,enAr	researcher			
+sterjefærsjarenær	sterjY,fAr,Sar,enAr	astronomer			
+merkbånd	merk,bOnd	banner (lit. mark band)			
+svartvægg	svart,vAg	blackboard (lit. black wall)			
+blådœklum	dlO,dEk,lum	blueprint			
+støvel	stUvYl	boot			
+huþestorm	huTY,storm	brainstorm			
+þjof	Tjof	thief			
+husþjof	hus,Tjof	burglar			
+innalt	in,al,t	total			
+lejr	ler	camp			
+tending	tend,iN	fire			
+lejrtending	ler,tend,iN	campfire			
+hakarl	hakarl	shark			
+maggenær	mag,enAr	magician, wizard			
+borg	borg	castle			
+athøfne	athUfnY	ceremony			
+dyrk	dyrk	dagger			
+gild	gild	value			
+gilddœklum	gild,dEk,lum	certificate			
+sky	Sy	cloud			
+sterjeskriving	sterjY,skriv,iN	constellation (lit. star writing)			
+kredit	kredit	credit			
+kreditkort	kredit,kort	credit card			
+ejging	eg,iN	debt			
+trogådœk	tro,gO,dEk	license			
+egg	eg	egg			
+ess	es	ace			
+enaskjotne	ena,Sot,nY	reroll			
+blom	blom	flower, bloom			
+pottre	potrY	pot			
+finger	fiNger	finger			
+gavne	gavnY	gift			
+sjatte	Sa,tY	(a) sight/vision			
+urþesjatte	urTY,Sa,tY	hallucination			
+hagi	hagi	prince/princess, jack (card rank)			
+iskrem	is,krem	ice cream			
+krem	krem	cream			
+idol	idol	idol			
+katt	kat	cat			
+post	post	mail			
+bakbœtaling	bak,bE,tal,iN	rebate, refund			
+marstejn	mar,sten	marble			
+grim	grim	mask			
+feilþrusjte	fel,TruS,tY	misprint			
+bejn	ben	bone			
+fjelltopp	fjEl,top	summit			
+dømi	dUmi	example (abbr. dm)			
+korn	korn	corn			
+poppkorn	popp,korn	popcorn			
+nœfi	nEfi	fist			
+visjatt	vi,Sa,t	show			
+rakœtt	rakEt	rocket			
+gnisstejn	gnis,sten	gem(stone)			
+løpenær	lUp,enAr	runner			
+satellit	satelit	satellite			
+sœltser	sEltser	seltzer			
+småvei	smO,vI	shortcut			
+vœþ	vET	sense			
+gejmur	gemur	(outer) space			
+firsid	fir,sid	square, rectangle			
+sjablon	Sablon	template, stencil			
+superutning	super,ut,n,iN	superposition			
+svindlenær	svindl,enAr	swashbuckler			
+meny	mEny	menu			
+bilœtt	bilEt	ticket			
+list	list	list			
+dålist	dO,list	to-do list			
+stamme	stamY	trunk, log; tribe			
+trubador	trubador	troubador			
+bukse	buksY	pants			
+vakkedyr	vakY,dyr	turtle			
+bønn	bUn	bean			
+vandrenær	vandrY,nAr	wanderer			
+vampyr	vampyr	vampire			
+tahsjeradio	taHSY,radio	walkie talkie (from pocket + radio)			
+klistrenær	klistr,enAr	sticker			
+hætte	hAtY	stake			
+hverdenasje	SverdEn,aSY	difficulty			
+ham	ham	mode			
+samling	saml,iN	collection			
+urgave	ur,gave	version			
+tagg	tag	tag			
+kjente	SEn,tY	familiar			
+sejþre	seTrY	spell, incantation			
+storsaga	stor,saga	legend			
+arkestejn	arkY,sten	talisman (lit. magic stone)			
+vandredraugr	vandrY,draugr	wraith			
+kerfi	kerfi	system			
+pengkerfi	peN,kerfi	economy			
+eþer	iTer	ether, aether			
+søppel	sUpYl	trash, garbage			
+innbœtaling	in,bE,tal,iN	investment			
+gejmurbane	gemur,banY	orbit			
+vagon	vagon	wagon, chariot			
+hœlv	hElv	hell			
+tosk	tosk	fool			
+fjellmensk	fjEl,mensk	hermit (lit. mountain person)			
+prœst	prEst	priest/priestess			
+dømming	dUm,iN	judgement			
+lundhet	lund,het	temperance			
+tårn	tOrn	tower			
+materie	materiY	matter			
+imaterie	i,materiY	antimatter			
+sal	sal	sale			
+kuttne	kut,nY	cut			
+falsksjatt	falsk,Sa,t	illusion (lit. false sight)			
+baum	bWm	tree			
+tang	taN	tong(s) (exclusively used plurally)			
+sjalak	Sa,lak	observatory			
+mål	mOl	paint			
+burste	burstY	brush			
+overhet	over,het	surplus			
+grens	grens	limit			
+fremsjaring	frem,Sar,iN	clairvoyance			
+reþe	reTY	nest			
+ståjing	stOj,iN	tax			
+sån	sO,n	seed			
+sjadeler	Sa,del,er	imagery			
+dœgåing	dE,gO,iN	motion			
+spill	spil	game			
+lødasje	lUd,aSY	volume			
+sjariþer	Sar,iT,er	graphics			
+skjerm	Serm	screen			
+kunst	kunst	art			
+napp	nap	button			
+stillenær	stil,enAr	controller			
+mørkiþ	mUrk,iT	shadow			
+lønn	lUn	reward			
+erresjing	ereS,iN	achievement			
+fremgåing	frem,gå,iN	progress			
+postlist	post,list	newsletter, mailing list			
+masjin	maSin	device, machine			
+varsel	varsYl	warning			
+strœkk	strEk	streak			
+frahengte	fra,heN,tY	dependency			
+vying	vy,iN	conflict			
+fremfœstne	frEm,fEst,nY	prefix			
+bakfœstne	bak,fEst,nY	suffix			
+skra	skra	directory			
+fil	fil	file			
+doring	dor,iN	behaviour			
+gangenær	gaN,enAr	counter			
+kafle	kaflY	chapter			
+bok	bok	book			
+fohtbok	foHt,bok	journal (lit. trip book)			
+forhaldighet	for,hald,i,het	stamina			
+harå	harO	temple			
+speglesjaring	speglY,Sar,iN	reflection			
+klyft	klyft	chasm, gorge			
+unnstahne	un,staH,nY	mess			
+løftenær	lUftY,nAr	elevator			
+magglak	mag,lak	shrine			
+kliff	klif	cliff			
+fulræntne	ful,rAnt,nY	depth(s)			
+rænt	rAnt	bottom			
+boklak	bok,lak	library			
+gupfse	gupfse	gust			
+herrær	herAr	master			
+jordbær	jord,bAr	strawberry			
+bær	bAr	berry			
+kutthjer	kut,Ser	cutscene			
+vakkutning	vak,ut,n,iN	checkpoint			
+friksjon	frikSon	friction			
+hikke	hikY	hiccup			
+bylje	byljY	wave			
+bro	bro	bridge			
+fjellkant	fjEl,kant	ridge (lit. mountain edge)			
+land	land	country; land			
+ulfur	ulfur	wolf			
+sløsne	slUs,nY	waste			
+foto	foto	photo			
+fotoenær	foto,enAr	photographer			
+rœhtlak	rEHt,lak	ruin			
+vår	vOr	danger, risk			
+kjær	SAr	darling, dear, honey (term of familial or friendly endearment)			
+sjaring	Sar,iN	attention			
+måned	mOn,ed	month			
+form	form	form			
+sivenær	siv,enAr	filter			
+sirkel	sirkYl	circle			
+litvorsjått	lit,vor,SO,t	poem			
+gjeste	jestY	guest			
+sesong	sesoN	season			
+smådel	smO,del	detail			
+aþil	aTil	entity; sentient being (legal)			
+fliser	fliser	tile			
+egnt	ent	property			
+dålœsk	dO,lEsk	tutorial			
+språklohv	sprOk,loHv	syntax			
+oppdoring	op,dor,iN	update			
+titœll	titEl	title			
+vøþvi	vUTvi	muscle			
+grunnramm	grun,ram	framework (lit. base frame)			
+konsoll	konsol	console			
+opplejing	op,lej,iN	setup			
+nalangnehet	na,laN,nY,het	presence			
+angst	aNst	anxiety			
+størung	stUruN	glitch			
+stromm	strom	electricity			
+lys	lys	light			
+samsvar	sam,svar	match			
+hvejgg	Svwg	branch			
+listdel	list,del	entry			
+sjåutning	SO,utniN	message board, channel, chat room			
+doring	dor,iN	action			
+lagne	lag,nY	storage			
+datalagne	data,lag,nY	database			
+provinnallt	prov,in,al,t	checksum			
+favoritt	favorit	favorite			
+tekstur	tekstur	texture			
