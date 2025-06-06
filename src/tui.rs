@@ -20,6 +20,7 @@ use std::marker::PhantomData;
 use traits::{EventfulState, WidgetRefMut};
 use word_choice::{run_choice, ChoiceWidget};
 use word_edit::run_word_edit;
+use word_update::{run_update, UpdateResult};
 
 macro_rules! key_event {
   ($code:pat) => {
@@ -42,6 +43,7 @@ mod scrollagraph;
 mod traits;
 mod word_choice;
 mod word_edit;
+mod word_update;
 
 fn handle_command<'a, B: Backend>(
   workingdb: &'a mut WorkingDatabase,
@@ -49,10 +51,6 @@ fn handle_command<'a, B: Backend>(
   command: Commands,
 ) -> eyre::Result<State<'a>> {
   let text: Text<'a> = match command {
-    Commands::Update {
-      sheet_ty,
-      sheet_file,
-    } => crate::db::update(workingdb, sheet_ty, sheet_file)?,
     Commands::Dump => crate::db::dump(workingdb),
     Commands::Phone {
       phone_matching,
@@ -180,6 +178,36 @@ fn handle_command<'a, B: Backend>(
       ignore_terminal_Y,
       ignore_H,
     } => crate::db::set_flags(workingdb, ignore_terminal_Y, ignore_H),
+    Commands::Update {
+      sheet_ty,
+      sheet_file,
+    } => {
+      let result = crate::db::auto_update(workingdb, sheet_ty, sheet_file)?;
+
+      let mut conflicts_saved = 0;
+      let mut conflicts_skipped = 0;
+      let mut conflicts_iter = result.conflicts.into_iter();
+
+      while let Some((word, uuids)) = conflicts_iter.next() {
+        match run_update(word, uuids, workingdb, terminal)? {
+          UpdateResult::Saved(uuid, word) => {
+            workingdb.update_word(uuid, word);
+            conflicts_saved += 1;
+          }
+          UpdateResult::Dismissed => conflicts_skipped += 1,
+          UpdateResult::Cancelled => break,
+        }
+      }
+
+      conflicts_skipped += conflicts_iter.count(); // drain any remaining conflicts
+
+      Text::from_iter([
+        format!("Added {} new records", result.added),
+        format!("Skipped {} duplicate records", result.skipped),
+        format!("Overwrote {} conflicting records", conflicts_saved),
+        format!("Skipped {} conflicting records", conflicts_skipped),
+      ])
+    }
     _ => unimplemented!(),
   };
 

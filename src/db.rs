@@ -264,17 +264,27 @@ pub struct WordData {
   pub word: crate::lang::Word,
 }
 
-pub fn update<'a>(
+pub struct UpdateInfo {
+  pub conflicts: Vec<(Word, Vec<Uuid>)>,
+  pub added: usize,
+  pub skipped: usize,
+}
+
+pub fn auto_update<'a>(
   db: &mut WorkingDatabase,
   sheet_ty: SheetType,
   sheet_file: std::path::PathBuf,
-) -> eyre::Result<Text<'a>> {
+) -> eyre::Result<UpdateInfo> {
   db.phones = None;
-
-  let mut buf = String::new();
 
   let file = std::fs::File::open(sheet_file)?;
   let reader = BufReader::new(file);
+  let _ = db.get_word_map();
+  let word_map = db.words.as_ref().unwrap();
+
+  let mut conflicts = Vec::new();
+  let mut added = 0;
+  let mut skipped = 0;
 
   for line in reader.lines().skip(1) {
     let line = line?;
@@ -387,12 +397,28 @@ pub fn update<'a>(
       pos,
     };
 
-    writeln!(buf, "{word:?}").unwrap();
+    if let Some(uuids) = word_map.get(&word.variants[0]) {
+      if uuids
+        .iter()
+        .any(|uuid| db.fetch(uuid).unwrap().word == word)
+      {
+        skipped += 1;
+        continue;
+      }
 
+      conflicts.push((word, uuids.iter().copied().collect_vec()));
+      continue;
+    }
+
+    added += 1;
     db.db.data.insert(Uuid::now_v7(), WordData { word });
   }
 
-  Ok(buf.into())
+  Ok(UpdateInfo {
+    conflicts,
+    added,
+    skipped,
+  })
 }
 
 pub fn dump<'a>(db: &Database) -> Text<'a> {
